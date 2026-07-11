@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../screens/login_screen.dart';
 import '../theme/app_theme.dart';
-import '../widgets/app_action_button.dart';
+import 'app_action_button.dart';
 
 enum ModuloApp {
   inicio('Inicio'),
@@ -40,24 +40,31 @@ enum ModuloApp {
       };
 }
 
-class AppDrawer extends StatelessWidget {
-  const AppDrawer({
+/// Layout del menú lateral (drawer deslizable o panel fijo en pantallas anchas).
+abstract final class AppMenuLayout {
+  static const anchoMenu = 280.0;
+  static const anchoMinimoMenuFijo = 1200.0;
+}
+
+/// Contenido del menú lateral, reutilizable en drawer y en panel fijo.
+class AppMenuPanel extends StatelessWidget {
+  const AppMenuPanel({
     super.key,
     required this.moduloActual,
     required this.onSeleccionar,
+    this.cerrarAlSeleccionar = false,
   });
 
   final ModuloApp moduloActual;
   final ValueChanged<ModuloApp> onSeleccionar;
+  final bool cerrarAlSeleccionar;
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
 
-    return Drawer(
-      width: 280,
-      backgroundColor: AppTheme.colorPanel,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+    return ColoredBox(
+      color: AppTheme.colorPanel,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -101,8 +108,10 @@ class AppDrawer extends StatelessWidget {
                       modulo: modulo,
                       seleccionado: modulo == moduloActual,
                       onTap: () {
-                        Navigator.of(context).pop();
                         onSeleccionar(modulo);
+                        if (cerrarAlSeleccionar) {
+                          Navigator.of(context).pop();
+                        }
                       },
                     ),
                 ],
@@ -119,7 +128,10 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Future<void> _solicitarCerrarSesion(BuildContext context, AuthProvider auth) async {
+  static Future<void> _solicitarCerrarSesion(
+    BuildContext context,
+    AuthProvider auth,
+  ) async {
     final navigator = Navigator.of(context, rootNavigator: true);
 
     final confirmar = await showDialog<bool>(
@@ -150,6 +162,31 @@ class AppDrawer extends StatelessWidget {
     navigator.pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
+    );
+  }
+}
+
+class AppDrawer extends StatelessWidget {
+  const AppDrawer({
+    super.key,
+    required this.moduloActual,
+    required this.onSeleccionar,
+  });
+
+  final ModuloApp moduloActual;
+  final ValueChanged<ModuloApp> onSeleccionar;
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      width: AppMenuLayout.anchoMenu,
+      backgroundColor: AppTheme.colorPanel,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      child: AppMenuPanel(
+        moduloActual: moduloActual,
+        onSeleccionar: onSeleccionar,
+        cerrarAlSeleccionar: true,
+      ),
     );
   }
 }

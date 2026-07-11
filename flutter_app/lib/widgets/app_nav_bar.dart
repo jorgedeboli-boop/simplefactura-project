@@ -14,6 +14,7 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onCerrarBusqueda,
     this.mostrarBusqueda = false,
     this.hintBusqueda = 'Buscar',
+    this.leading,
   });
 
   final String titulo;
@@ -24,6 +25,7 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onAlternarBusqueda;
   final VoidCallback onCerrarBusqueda;
   final ValueChanged<String> onBusquedaChanged;
+  final Widget? leading;
 
   static const _altura = 56.0;
 
@@ -42,6 +44,7 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
           width: double.infinity,
           child: Row(
             children: [
+              if (leading != null) leading!,
               IconButton(
                 icon: Icon(Icons.arrow_back, color: Colors.grey.shade700),
                 onPressed: onAlternarBusqueda,
@@ -71,6 +74,8 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
       foregroundColor: Colors.white,
       elevation: 2,
       shadowColor: Colors.black26,
+      automaticallyImplyLeading: leading == null,
+      leading: leading,
       title: Text(
         titulo,
         style: const TextStyle(

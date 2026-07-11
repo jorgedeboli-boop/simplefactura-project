@@ -18,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ModuloApp _moduloActual = ModuloApp.inicio;
   bool _busquedaActiva = false;
   String _busqueda = '';
+  bool _menuFijoVisible = true;
   final _buscadorController = TextEditingController();
 
   @override
@@ -58,27 +59,83 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => _busqueda = valor);
   }
 
+  void _alternarMenuFijo() {
+    setState(() => _menuFijoVisible = !_menuFijoVisible);
+  }
+
+  Widget? _botonMenu({required bool menuFijo}) {
+    if (menuFijo) {
+      return IconButton(
+        icon: Icon(_menuFijoVisible ? Icons.menu_open : Icons.menu),
+        tooltip: _menuFijoVisible ? 'Ocultar menú' : 'Mostrar menú',
+        onPressed: _alternarMenuFijo,
+      );
+    }
+    return null;
+  }
+
+  PreferredSizeWidget _appBar({required bool menuFijo}) {
+    return AppNavBar(
+      titulo: _moduloActual.titulo,
+      busquedaActiva: _busquedaActiva,
+      mostrarBusqueda: _moduloActual.esLista,
+      hintBusqueda: _moduloActual.hintBusqueda,
+      busquedaController: _buscadorController,
+      onAlternarBusqueda: _alternarBusqueda,
+      onCerrarBusqueda: _cerrarBusqueda,
+      onBusquedaChanged: _onBusquedaChanged,
+      leading: _botonMenu(menuFijo: menuFijo),
+    );
+  }
+
+  Widget _cuerpo() {
+    return _ContenidoModulo(
+      modulo: _moduloActual,
+      busqueda: _busqueda,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final menuFijo =
+        MediaQuery.sizeOf(context).width > AppMenuLayout.anchoMinimoMenuFijo;
+
+    if (menuFijo) {
+      return Scaffold(
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              width: _menuFijoVisible ? AppMenuLayout.anchoMenu : 0,
+              clipBehavior: Clip.hardEdge,
+              decoration: const BoxDecoration(),
+              child: _menuFijoVisible
+                  ? AppMenuPanel(
+                      moduloActual: _moduloActual,
+                      onSeleccionar: _seleccionarModulo,
+                    )
+                  : null,
+            ),
+            Expanded(
+              child: Scaffold(
+                appBar: _appBar(menuFijo: true),
+                body: _cuerpo(),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
-      appBar: AppNavBar(
-        titulo: _moduloActual.titulo,
-        busquedaActiva: _busquedaActiva,
-        mostrarBusqueda: _moduloActual.esLista,
-        hintBusqueda: _moduloActual.hintBusqueda,
-        busquedaController: _buscadorController,
-        onAlternarBusqueda: _alternarBusqueda,
-        onCerrarBusqueda: _cerrarBusqueda,
-        onBusquedaChanged: _onBusquedaChanged,
-      ),
+      appBar: _appBar(menuFijo: false),
       drawer: AppDrawer(
         moduloActual: _moduloActual,
         onSeleccionar: _seleccionarModulo,
       ),
-      body: _ContenidoModulo(
-        modulo: _moduloActual,
-        busqueda: _busqueda,
-      ),
+      body: _cuerpo(),
     );
   }
 }
