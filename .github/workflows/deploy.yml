@@ -43,7 +43,6 @@ jobs:
 
       - name: Deploy to FTP
         id: deploy_ftp
-        continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -65,7 +64,7 @@ jobs:
             **/.DS_Store
 
       - name: Reintentar deploy FTP
-        if: steps.deploy_ftp.outcome == 'failure'
+        if: failure()
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
