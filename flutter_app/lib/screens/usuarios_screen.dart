@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:pwa_virtualized_list/pwa_virtualized_list.dart';
 
 import '../constants/roles_catalogo.dart';
 import '../models/rol.dart';
@@ -255,9 +254,9 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                       children: [
                         if (vistaTabla) const _CabeceraListado(),
                         Expanded(
-                          child: PwaVirtualizedList(
+                          child: ListView.builder(
                             itemCount: filtrados.length,
-                            itemHeight: _alturaFila,
+                            itemExtent: _alturaFila,
                             itemBuilder: (context, index) {
                               final usuario = filtrados[index];
                               return _FilaUsuario(

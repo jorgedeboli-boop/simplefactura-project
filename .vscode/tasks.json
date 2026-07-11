@@ -4,7 +4,8 @@
     {
       "label": "📱 Abrir simulador iOS",
       "type": "shell",
-      "command": "open -a Simulator || flutter emulators --launch apple_ios_simulator",
+      "command": "bash",
+      "args": ["${workspaceFolder}/scripts/boot_ios_simulator.sh"],
       "presentation": {
         "reveal": "silent",
         "panel": "shared"
@@ -36,6 +37,17 @@
       "type": "shell",
       "command": "bash",
       "args": ["${workspaceFolder}/scripts/dev_web.sh"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+    {
+      "label": "🍎 Flutter iOS (terminal)",
+      "type": "shell",
+      "command": "bash",
+      "args": ["${workspaceFolder}/scripts/run_flutter_ios.sh"],
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",

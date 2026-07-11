@@ -7,7 +7,10 @@
       "type": "dart",
       "program": "lib/main.dart",
       "cwd": "${workspaceFolder}/flutter_app",
-      "deviceId": "iPhone",
+      "toolArgs": [
+        "-d",
+        "8DEFF3D4-A940-4561-B260-A5059FAD7B11"
+      ],
       "args": [
         "--dart-define=API_BASE_URL=http://localhost:8080/index.php"
       ],
@@ -19,9 +22,11 @@
       "type": "dart",
       "program": "lib/main.dart",
       "cwd": "${workspaceFolder}/flutter_app",
-      "args": [
+      "toolArgs": [
         "-d",
-        "chrome",
+        "chrome"
+      ],
+      "args": [
         "--dart-define=API_BASE_URL=http://localhost:8080/index.php"
       ],
       "preLaunchTask": "🐘 API PHP local"
@@ -32,7 +37,7 @@
       "type": "dart",
       "program": "lib/main.dart",
       "cwd": "${workspaceFolder}/flutter_app",
-      "args": [
+      "toolArgs": [
         "-d",
         "chrome"
       ]

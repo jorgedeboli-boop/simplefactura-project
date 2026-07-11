@@ -328,14 +328,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.5+1"
-  pwa_virtualized_list:
-    dependency: "direct main"
-    description:
-      name: pwa_virtualized_list
-      sha256: "951fb5261abb53b6373bd72b76b7f70c9999f55e15f247dd7e202f6646efb5d5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   qr:
     dependency: transitive
     description:
