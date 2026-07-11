@@ -7,10 +7,7 @@
       "type": "dart",
       "program": "lib/main.dart",
       "cwd": "${workspaceFolder}/flutter_app",
-      "toolArgs": [
-        "-d",
-        "8DEFF3D4-A940-4561-B260-A5059FAD7B11"
-      ],
+      "deviceId": "8DEFF3D4-A940-4561-B260-A5059FAD7B11",
       "args": [
         "--dart-define=API_BASE_URL=http://localhost:8080/index.php"
       ],
@@ -22,10 +19,7 @@
       "type": "dart",
       "program": "lib/main.dart",
       "cwd": "${workspaceFolder}/flutter_app",
-      "toolArgs": [
-        "-d",
-        "chrome"
-      ],
+      "deviceId": "chrome",
       "args": [
         "--dart-define=API_BASE_URL=http://localhost:8080/index.php"
       ],
@@ -37,10 +31,7 @@
       "type": "dart",
       "program": "lib/main.dart",
       "cwd": "${workspaceFolder}/flutter_app",
-      "toolArgs": [
-        "-d",
-        "chrome"
-      ]
+      "deviceId": "chrome"
     }
   ]
 }
