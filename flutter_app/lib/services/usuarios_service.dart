@@ -1,3 +1,4 @@
+import '../models/usuario_conexion.dart';
 import '../models/rol.dart';
 import '../models/usuario_listado.dart';
 import 'api_service.dart';
@@ -60,5 +61,15 @@ class UsuariosService {
       if (password != null && password.isNotEmpty) 'password': password,
     });
     return UsuarioListado.fromJson(data as Map<String, dynamic>);
+  }
+
+  Future<List<UsuarioConexion>> listarConexiones(int usuarioId) async {
+    final data = await _api.get('usuarios_conexiones_listar', parametros: {
+      'usuario_id': '$usuarioId',
+    });
+    final lista = data as List<dynamic>;
+    return lista
+        .map((item) => UsuarioConexion.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 }

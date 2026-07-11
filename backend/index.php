@@ -38,6 +38,7 @@ $rutas = array(
     'usuarios_listar'     => 'endpoints/usuarios_listar.php',
     'usuarios_crear'      => 'endpoints/usuarios_crear.php',
     'usuarios_actualizar' => 'endpoints/usuarios_actualizar.php',
+    'usuarios_conexiones_listar' => 'endpoints/usuarios_conexiones_listar.php',
     'roles_listar'        => 'endpoints/roles_listar.php',
 
     'clientes_listar'     => 'endpoints/clientes_listar.php',
