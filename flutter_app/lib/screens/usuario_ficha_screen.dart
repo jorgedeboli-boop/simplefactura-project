@@ -77,71 +77,56 @@ class _UsuarioFichaScreenState extends State<UsuarioFichaScreen>
         _volver();
       },
       child: Scaffold(
+        backgroundColor: AppTheme.colorFondo,
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: _volver,
           ),
-          title: const Text('Usuario'),
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+          title: Text(
+            _usuario.nombreCompleto,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          actions: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Text(
-                      _usuario.nombreCompleto,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.colorTexto,
-                          ),
-                    ),
+              padding: const EdgeInsets.only(right: 8),
+              child: Material(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: const CircleBorder(),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: _editar,
+                  customBorder: const CircleBorder(),
+                  child: const SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Icon(Icons.edit, color: Colors.white, size: 18),
                   ),
-                  const SizedBox(width: 12),
-                  Material(
-                    color: AppTheme.colorNavBar,
-                    shape: const CircleBorder(),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onTap: _editar,
-                      customBorder: const CircleBorder(),
-                      child: const SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: Icon(Icons.edit, color: Colors.white, size: 20),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            TabBar(
-              controller: _tabController,
-              labelColor: AppTheme.colorNavBar,
-              unselectedLabelColor: AppTheme.colorTexto.withValues(alpha: 0.55),
-              indicatorColor: AppTheme.colorNavBar,
-              indicatorWeight: 3,
-              tabs: const [
-                Tab(text: 'Información'),
-                Tab(text: 'Conexiones'),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _TabInformacion(usuario: _usuario),
-                  _TabConexiones(
-                    usuarioId: _usuario.id,
-                    servicio: widget.servicio,
-                  ),
-                ],
-              ),
+          ],
+          bottom: TabBar(
+            controller: _tabController,
+            indicatorColor: Colors.white,
+            indicatorWeight: 3,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white.withValues(alpha: 0.65),
+            labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            tabs: const [
+              Tab(text: 'Información'),
+              Tab(text: 'Conexiones'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            _TabInformacion(usuario: _usuario),
+            _TabConexiones(
+              usuarioId: _usuario.id,
+              servicio: widget.servicio,
             ),
           ],
         ),
@@ -168,6 +153,11 @@ class _TabInformacion extends StatelessWidget {
           etiqueta: 'Email',
           valor: usuario.email,
         ),
+        if (usuario.telefono != null && usuario.telefono!.isNotEmpty)
+          _CampoDetalle(
+            etiqueta: 'Teléfono',
+            valor: usuario.telefono!,
+          ),
         _CampoDetalle(
           etiqueta: 'Jerarquía',
           valor: usuario.roleNombre,
@@ -344,34 +334,37 @@ class _TabConexionesState extends State<_TabConexiones> {
               final conexion = conexiones[index];
               final local = conexion.fechaConexion.toLocal();
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        conexion.ip.isNotEmpty ? conexion.ip : '—',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+              return Material(
+                color: AppTheme.colorFondo,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          conexion.ip.isNotEmpty ? conexion.ip : '—',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        _formatoFecha.format(local),
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          _formatoFecha.format(local),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 56,
-                      child: Text(
-                        _formatoHora.format(local),
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      SizedBox(
+                        width: 56,
+                        child: Text(
+                          _formatoHora.format(local),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

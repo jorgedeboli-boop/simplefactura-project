@@ -42,6 +42,8 @@ jobs:
           ls -lh flutter_app/build/web/flutter_service_worker.js 2>/dev/null || true
 
       - name: Deploy to FTP
+        id: deploy_ftp
+        continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -51,11 +53,32 @@ jobs:
           protocol: ftp
           local-dir: flutter_app/build/web/
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          # Estado nuevo por ejecución → sube todos los archivos (evita SW/index desactualizados)
           state-name: .ftp-deploy-state-${{ github.run_id }}.json
           log-level: verbose
           security: loose
           dangerous-clean-slate: ${{ github.event_name == 'workflow_dispatch' && inputs.force_full_deploy == true }}
+          exclude: |
+            **/.git*
+            **/.git/**
+            **/api/config/constantes.php
+            **/_notes/**
+            **/.DS_Store
+
+      - name: Reintentar deploy FTP
+        if: steps.deploy_ftp.outcome == 'failure'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
+          local-dir: flutter_app/build/web/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          state-name: .ftp-deploy-state-${{ github.run_id }}-retry.json
+          log-level: verbose
+          security: loose
+          dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.git/**
