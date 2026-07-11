@@ -52,6 +52,8 @@ class JerarquiaSelector extends StatelessWidget {
   final JerarquiaSelectorEstilo estilo;
   final double anchoMaximo;
 
+  static const _bordeCampo = Color(0xFFDDE3EA);
+
   List<_OpcionJerarquia> get _opciones {
     final opciones = <_OpcionJerarquia>[];
     if (mostrarOpcionTodos) {
@@ -119,8 +121,8 @@ class JerarquiaSelector extends StatelessWidget {
       expandedFillColor: Colors.white,
       closedBorderRadius: BorderRadius.circular(10),
       expandedBorderRadius: BorderRadius.circular(10),
-      closedBorder: Border.all(color: AppTheme.colorTexto.withValues(alpha: 0.25)),
-      expandedBorder: Border.all(color: AppTheme.colorPrimario),
+      closedBorder: Border.all(color: _bordeCampo),
+      expandedBorder: Border.all(color: AppTheme.colorPrimario, width: 1.5),
       headerStyle: ThemeData.light().textTheme.bodyLarge?.copyWith(
             color: AppTheme.colorTexto,
           ),
@@ -146,6 +148,58 @@ class JerarquiaSelector extends StatelessWidget {
     );
   }
 
+  /// Quita el borde/fondo del [InputDecorator] interno de [DropdownFlutter].
+  Widget _sinDecoracionInput(BuildContext context, Widget child) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: false,
+          fillColor: Colors.transparent,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          isDense: true,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: child,
+      ),
+    );
+  }
+
+  Widget _campoConEtiquetaFlotante(Widget dropdown) {
+    final muestraEtiqueta = _opcionInicial != null;
+
+    if (!muestraEtiqueta) return dropdown;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        dropdown,
+        Positioned(
+          left: 11,
+          top: -8,
+          child: Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppTheme.colorTexto.withValues(alpha: 0.65),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final opciones = _opciones;
@@ -160,33 +214,15 @@ class JerarquiaSelector extends StatelessWidget {
       excludeSelected: false,
       closedHeaderPadding: esPill
           ? const EdgeInsets.symmetric(horizontal: 16, vertical: 10)
-          : const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          : const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: esPill ? _decoracionPill : _decoracionCampo,
       onChanged: (opcion) => onChanged(opcion?.id),
     );
 
-    final contenido = esPill
-        ? Theme(
-            data: Theme.of(context).copyWith(
-              inputDecorationTheme: const InputDecorationTheme(
-                filled: false,
-                fillColor: Colors.transparent,
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                errorBorder: InputBorder.none,
-                focusedErrorBorder: InputBorder.none,
-                disabledBorder: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
-              ),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: dropdown,
-            ),
-          )
-        : dropdown;
+    var contenido = _sinDecoracionInput(context, dropdown);
+    if (!esPill) {
+      contenido = _campoConEtiquetaFlotante(contenido);
+    }
 
     return ConstrainedBox(
       constraints: BoxConstraints(
