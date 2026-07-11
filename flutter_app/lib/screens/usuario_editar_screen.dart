@@ -199,27 +199,29 @@ class _UsuarioEditarScreenState extends State<UsuarioEditarScreen> {
                     onChanged: (valor) => setState(() => _roleId = valor),
                   ),
                   const SizedBox(height: 16),
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      textTheme: Theme.of(context).textTheme.copyWith(
-                        bodyLarge: AppTheme.textoDropdown,
-                        bodyMedium: AppTheme.textoDropdown,
+                  AbsorbPointer(
+                    absorbing: _guardando,
+                    child: Opacity(
+                      opacity: _guardando ? 0.55 : 1,
+                      child: SegmentedButton<String>(
+                        segments: const [
+                          ButtonSegment(value: 'activo', label: Text('Activo')),
+                          ButtonSegment(value: 'inactivo', label: Text('Inactivo')),
+                        ],
+                        selected: {_estado},
+                        emptySelectionAllowed: false,
+                        showSelectedIcon: false,
+                        onSelectionChanged: (selection) {
+                          setState(() => _estado = selection.first);
+                        },
+                        style: SegmentedButton.styleFrom(
+                          selectedBackgroundColor: AppTheme.colorNavBar,
+                          selectedForegroundColor: Colors.white,
+                          foregroundColor: AppTheme.colorTexto,
+                          textStyle: AppTheme.textoDropdown,
+                          side: const BorderSide(color: Color(0xFFDDE3EA)),
+                        ),
                       ),
-                    ),
-                    child: DropdownMenu<String>(
-                      key: ValueKey('estado-$_estado'),
-                      initialSelection: _estado,
-                      expandedInsets: EdgeInsets.zero,
-                      textStyle: AppTheme.textoDropdown,
-                      dropdownMenuEntries: const [
-                        DropdownMenuEntry(value: 'activo', label: 'Activo'),
-                        DropdownMenuEntry(value: 'inactivo', label: 'Inactivo'),
-                      ],
-                      onSelected: _guardando
-                          ? null
-                          : (valor) {
-                              if (valor != null) setState(() => _estado = valor);
-                            },
                     ),
                   ),
                   const SizedBox(height: 16),
