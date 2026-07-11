@@ -12,6 +12,7 @@ import '../services/usuarios_export_service.dart';
 import '../services/usuarios_service.dart';
 import '../utils/file_download.dart';
 import '../widgets/jerarquia_selector.dart';
+import '../widgets/panel_lateral.dart';
 import '../theme/app_theme.dart';
 import 'usuario_ficha_screen.dart';
 import 'usuario_crear_screen.dart';
@@ -125,11 +126,9 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
   }
 
   Future<void> _abrirFormularioCrear() async {
-    final creado = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => UsuarioCrearScreen(servicio: _servicio!),
-      ),
+    final creado = await abrirPanelLateral<bool>(
+      context,
+      child: UsuarioCrearScreen(servicio: _servicio!),
     );
 
     if (!mounted || creado != true) return;

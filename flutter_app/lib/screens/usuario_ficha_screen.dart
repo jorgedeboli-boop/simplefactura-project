@@ -6,6 +6,7 @@ import '../models/usuario_listado.dart';
 import '../services/api_service.dart';
 import '../services/usuarios_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/panel_lateral.dart';
 import 'usuario_editar_screen.dart';
 
 class UsuarioFichaScreen extends StatefulWidget {
@@ -42,13 +43,11 @@ class _UsuarioFichaScreenState extends State<UsuarioFichaScreen>
   }
 
   Future<void> _editar() async {
-    final actualizado = await Navigator.of(context).push<UsuarioListado>(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => UsuarioEditarScreen(
-          servicio: widget.servicio,
-          usuario: _usuario,
-        ),
+    final actualizado = await abrirPanelLateral<UsuarioListado>(
+      context,
+      child: UsuarioEditarScreen(
+        servicio: widget.servicio,
+        usuario: _usuario,
       ),
     );
 

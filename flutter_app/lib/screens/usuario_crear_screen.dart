@@ -119,6 +119,10 @@ class _UsuarioCrearScreenState extends State<UsuarioCrearScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text('Crear usuario'),
       ),
       body: _cargandoRoles

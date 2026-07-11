@@ -135,6 +135,10 @@ class _UsuarioEditarScreenState extends State<UsuarioEditarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text('Editar usuario'),
       ),
       body: _cargandoRoles
