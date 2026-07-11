@@ -55,6 +55,7 @@ class AppDrawer extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
 
     return Drawer(
+      width: 280,
       backgroundColor: AppTheme.colorPanel,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: SafeArea(
@@ -90,7 +91,7 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const Divider(color: Colors.white24, height: 1, indent: 20, endIndent: 20),
+            const Divider(color: Colors.white24, height: 1),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -107,7 +108,7 @@ class AppDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            const Divider(color: Colors.white24, height: 1, indent: 20, endIndent: 20),
+            const Divider(color: Colors.white24, height: 1),
             ListTile(
               title: Text('Cerrar sesión', style: AppTheme.textoDrawerSecundario),
               onTap: () => _solicitarCerrarSesion(context, auth),
