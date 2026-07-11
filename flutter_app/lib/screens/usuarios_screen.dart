@@ -8,7 +8,9 @@ import '../models/rol.dart';
 import '../models/usuario_listado.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../services/usuarios_export_service.dart';
 import '../services/usuarios_service.dart';
+import '../utils/file_download.dart';
 import '../widgets/jerarquia_selector.dart';
 import '../theme/app_theme.dart';
 import 'usuario_ficha_screen.dart';
@@ -35,6 +37,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
   static const _alturaFila = 72.0;
   static const _anchoVistaTabla = 1200.0;
   static final _formatoFecha = DateFormat('dd/MM/yyyy HH:mm');
+  final _exportService = UsuariosExportService(formatoFecha: _formatoFecha);
 
   @override
   void didChangeDependencies() {
@@ -139,6 +142,40 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     );
   }
 
+  Future<void> _exportar(List<UsuarioListado> usuarios, {required bool pdf}) async {
+    if (usuarios.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay usuarios para exportar')),
+      );
+      return;
+    }
+
+    try {
+      final archivo = pdf
+          ? await _exportService.exportarPdf(usuarios)
+          : _exportService.exportarExcel(usuarios);
+
+      descargarArchivo(
+        nombre: archivo.nombre,
+        bytes: archivo.bytes,
+        mimeType: pdf
+            ? 'application/pdf'
+            : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Exportado: ${archivo.nombre}')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo exportar el listado')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_cargando) {
@@ -187,6 +224,9 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                 roleFiltroId: _roleFiltroId,
                 onRoleChanged: (id) => setState(() => _roleFiltroId = id),
                 onCrear: _abrirFormularioCrear,
+                usuariosExportables: filtrados,
+                onExportarPdf: () => _exportar(filtrados, pdf: true),
+                onExportarExcel: () => _exportar(filtrados, pdf: false),
               ),
               const SizedBox(height: 12),
               _ChipsResumen(
@@ -249,17 +289,29 @@ class _BarraAcciones extends StatelessWidget {
     required this.roleFiltroId,
     required this.onRoleChanged,
     required this.onCrear,
+    required this.usuariosExportables,
+    required this.onExportarPdf,
+    required this.onExportarExcel,
   });
 
   final List<Rol> roles;
   final int? roleFiltroId;
   final ValueChanged<int?> onRoleChanged;
   final VoidCallback onCrear;
+  final List<UsuarioListado> usuariosExportables;
+  final VoidCallback onExportarPdf;
+  final VoidCallback onExportarExcel;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
+        _BotonExportar(
+          habilitado: usuariosExportables.isNotEmpty,
+          onExportarPdf: onExportarPdf,
+          onExportarExcel: onExportarExcel,
+        ),
+        const SizedBox(width: 12),
         JerarquiaSelector(
           roles: roles,
           valor: roleFiltroId,
@@ -282,6 +334,68 @@ class _BarraAcciones extends StatelessWidget {
               child: Icon(Icons.add, color: Colors.white),
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BotonExportar extends StatelessWidget {
+  const _BotonExportar({
+    required this.habilitado,
+    required this.onExportarPdf,
+    required this.onExportarExcel,
+  });
+
+  final bool habilitado;
+  final VoidCallback onExportarPdf;
+  final VoidCallback onExportarExcel;
+
+  void _alternarMenu(MenuController controller) {
+    if (!habilitado) return;
+    if (controller.isOpen) {
+      controller.close();
+    } else {
+      controller.open();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MenuAnchor(
+      style: MenuStyle(
+        visualDensity: VisualDensity.compact,
+        padding: WidgetStateProperty.all(EdgeInsets.zero),
+      ),
+      alignmentOffset: const Offset(0, 4),
+      builder: (context, controller, child) {
+        return Material(
+          color: habilitado
+              ? AppTheme.colorNavBar
+              : AppTheme.colorNavBar.withValues(alpha: 0.45),
+          shape: const CircleBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => _alternarMenu(controller),
+            customBorder: const CircleBorder(),
+            child: const SizedBox(
+              width: 40,
+              height: 40,
+              child: Icon(Icons.file_download_outlined, color: Colors.white),
+            ),
+          ),
+        );
+      },
+      menuChildren: [
+        MenuItemButton(
+          onPressed: onExportarPdf,
+          leadingIcon: const Icon(Icons.picture_as_pdf_outlined),
+          child: const Text('PDF'),
+        ),
+        MenuItemButton(
+          onPressed: onExportarExcel,
+          leadingIcon: const Icon(Icons.table_chart_outlined),
+          child: const Text('Excel'),
         ),
       ],
     );
