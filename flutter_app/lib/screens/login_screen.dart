@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -20,9 +21,30 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _passwordVisible = false;
+  bool _credencialesCargadas = false;
 
   static const _anchoMaximo = 320.0;
   static const _alturaBoton = 48.0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_credencialesCargadas) return;
+    _credencialesCargadas = true;
+    _restaurarCredenciales();
+  }
+
+  Future<void> _restaurarCredenciales() async {
+    final credenciales = await context.read<AuthProvider>().credencialesLoginGuardadas();
+    if (!mounted) return;
+    if (credenciales.email != null && credenciales.email!.isNotEmpty) {
+      _emailController.text = credenciales.email!;
+    }
+    if (credenciales.password != null && credenciales.password!.isNotEmpty) {
+      _passwordController.text = credenciales.password!;
+    }
+    setState(() {});
+  }
 
   @override
   void dispose() {
@@ -41,6 +63,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (ok && mounted) {
+      await auth.guardarCredencialesLogin(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      TextInput.finishAutofillContext(shouldSave: true);
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
@@ -68,42 +96,51 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: _anchoMaximo),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(
-                    'assets/logo/logotipo_simple_factura.svg',
-                    height: 54,
-                  ),
-                  const SizedBox(height: 32),
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'Requerido';
-                      if (!v.contains('@')) return 'Email no válido';
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: !_passwordVisible,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña',
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _passwordVisible ? Icons.visibility_off : Icons.visibility,
-                        ),
-                        onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
-                      ),
+            child: AutofillGroup(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/logo/logotipo_simple_factura.svg',
+                      height: 54,
                     ),
-                    validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
-                    onFieldSubmitted: (_) => _enviar(),
-                  ),
+                    const SizedBox(height: 32),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      autofillHints: const [AutofillHints.username, AutofillHints.email],
+                      textInputAction: TextInputAction.next,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) return 'Requerido';
+                        if (!v.contains('@')) return 'Email no válido';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: !_passwordVisible,
+                      autofillHints: const [AutofillHints.password],
+                      textInputAction: TextInputAction.done,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      decoration: InputDecoration(
+                        labelText: 'Contraseña',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisible ? Icons.visibility_off : Icons.visibility,
+                          ),
+                          onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+                        ),
+                      ),
+                      validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
+                      onFieldSubmitted: (_) => _enviar(),
+                    ),
                   if (auth.error != null) ...[
                     const SizedBox(height: 16),
                     Text(
@@ -161,6 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

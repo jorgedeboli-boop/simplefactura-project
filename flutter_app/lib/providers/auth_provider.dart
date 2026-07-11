@@ -106,8 +106,33 @@ class AuthProvider extends ChangeNotifier {
     _api.establecerToken(null);
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    await prefs.remove('sf_token');
+    await prefs.remove('sf_usuario_id');
+    await prefs.remove('sf_usuario_nombre');
+    await prefs.remove('sf_usuario_email');
+    await prefs.remove('sf_usuario_role_id');
+    await prefs.remove('sf_empresa_identificador');
+    await prefs.remove('sf_empresa_nombre');
 
     notifyListeners();
+  }
+
+  /// Guarda email y contraseña para el formulario de login (no se borran al cerrar sesion).
+  Future<void> guardarCredencialesLogin({
+    required String email,
+    required String password,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('sf_login_email', email);
+    await prefs.setString('sf_login_password', password);
+  }
+
+  /// Credenciales guardadas del login (localStorage en web).
+  Future<({String? email, String? password})> credencialesLoginGuardadas() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (
+      email: prefs.getString('sf_login_email'),
+      password: prefs.getString('sf_login_password'),
+    );
   }
 }
