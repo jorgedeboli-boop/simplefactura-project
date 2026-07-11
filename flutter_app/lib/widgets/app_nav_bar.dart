@@ -51,8 +51,13 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
                   controller: busquedaController,
                   hint: hintBusqueda,
                   onChanged: onBusquedaChanged,
-                  onPerdioFoco: onCerrarBusqueda,
+                  onPerdioFocoVacio: onCerrarBusqueda,
                 ),
+              ),
+              IconButton(
+                icon: Icon(Icons.close, color: Colors.grey.shade700, size: 22),
+                onPressed: onCerrarBusqueda,
+                tooltip: 'Cerrar búsqueda',
               ),
             ],
           ),
@@ -91,13 +96,13 @@ class _CampoBusquedaNavBar extends StatefulWidget {
     required this.controller,
     required this.hint,
     required this.onChanged,
-    required this.onPerdioFoco,
+    required this.onPerdioFocoVacio,
   });
 
   final TextEditingController controller;
   final String hint;
   final ValueChanged<String> onChanged;
-  final VoidCallback onPerdioFoco;
+  final VoidCallback onPerdioFocoVacio;
 
   @override
   State<_CampoBusquedaNavBar> createState() => _CampoBusquedaNavBarState();
@@ -114,7 +119,9 @@ class _CampoBusquedaNavBarState extends State<_CampoBusquedaNavBar> {
   }
 
   void _alCambiarFoco() {
-    if (!_focusNode.hasFocus) widget.onPerdioFoco();
+    if (!_focusNode.hasFocus && widget.controller.text.trim().isEmpty) {
+      widget.onPerdioFocoVacio();
+    }
   }
 
   @override
