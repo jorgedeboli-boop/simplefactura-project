@@ -22,7 +22,8 @@ $conexiones = db_consultar(
     $conexionTenant,
     "SELECT idUserConexion AS id,
             ipNumberUser AS ip,
-            dateConexion AS fecha_conexion
+            dateConexion AS fecha_conexion,
+            groupId AS group_id
      FROM usersConexions
      WHERE userId = ?
      ORDER BY dateConexion DESC",

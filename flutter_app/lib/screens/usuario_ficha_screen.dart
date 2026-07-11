@@ -293,6 +293,16 @@ class _TabConexionesState extends State<_TabConexiones> {
               Expanded(
                 flex: 3,
                 child: Text(
+                  'Evento',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.colorTexto.withValues(alpha: 0.55),
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(
                   'IP',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppTheme.colorTexto.withValues(alpha: 0.55),
@@ -339,9 +349,14 @@ class _TabConexionesState extends State<_TabConexiones> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
                         flex: 3,
+                        child: _BadgeEventoConexion(conexion: conexion),
+                      ),
+                      Expanded(
+                        flex: 2,
                         child: Text(
                           conexion.ip.isNotEmpty ? conexion.ip : '—',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -371,6 +386,42 @@ class _TabConexionesState extends State<_TabConexiones> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _BadgeEventoConexion extends StatelessWidget {
+  const _BadgeEventoConexion({required this.conexion});
+
+  final UsuarioConexion conexion;
+
+  @override
+  Widget build(BuildContext context) {
+    final etiqueta = conexion.etiquetaEvento;
+    final color = conexion.colorEvento;
+
+    if (etiqueta == null || color == null) {
+      return Text(
+        'Grupo ${conexion.groupId}',
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppTheme.colorTexto.withValues(alpha: 0.55),
+            ),
+      );
+    }
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Chip(
+        label: Text(
+          etiqueta,
+          style: TextStyle(color: color, fontSize: 11),
+        ),
+        backgroundColor: color.withValues(alpha: 0.12),
+        side: BorderSide.none,
+        visualDensity: VisualDensity.compact,
+        padding: EdgeInsets.zero,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
     );
   }
 }
