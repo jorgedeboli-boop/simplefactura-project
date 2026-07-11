@@ -33,6 +33,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
   bool _inicializado = false;
 
   static const _alturaFila = 72.0;
+  static const _anchoVistaTabla = 1200.0;
   static final _formatoFecha = DateFormat('dd/MM/yyyy HH:mm');
 
   @override
@@ -171,6 +172,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     }
 
     final filtrados = _usuariosFiltrados;
+    final vistaTabla = MediaQuery.sizeOf(context).width > _anchoVistaTabla;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -209,17 +211,26 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                             ),
                       ),
                     )
-                  : PwaVirtualizedList(
-                      itemCount: filtrados.length,
-                      itemHeight: _alturaFila,
-                      itemBuilder: (context, index) {
-                        final usuario = filtrados[index];
-                        return _FilaUsuario(
-                          usuario: usuario,
-                          formatearFecha: _formatearFecha,
-                          onTap: () => _abrirFicha(usuario),
-                        );
-                      },
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (vistaTabla) const _CabeceraListado(),
+                        Expanded(
+                          child: PwaVirtualizedList(
+                            itemCount: filtrados.length,
+                            itemHeight: _alturaFila,
+                            itemBuilder: (context, index) {
+                              final usuario = filtrados[index];
+                              return _FilaUsuario(
+                                usuario: usuario,
+                                formatearFecha: _formatearFecha,
+                                vistaTabla: vistaTabla,
+                                onTap: () => _abrirFicha(usuario),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
         ),
       ],
@@ -337,19 +348,162 @@ class _ListaVacia extends StatelessWidget {
   }
 }
 
+class _CabeceraListado extends StatelessWidget {
+  const _CabeceraListado();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: AppTheme.colorTexto.withValues(alpha: 0.08)),
+        ),
+      ),
+      child: const _FilasColumnas(
+        id: '#',
+        nombre: 'Nombre',
+        email: 'Email',
+        jerarquia: 'Jerarquía',
+        estado: 'Estado',
+        esCabecera: true,
+      ),
+    );
+  }
+}
+
+class _FilasColumnas extends StatelessWidget {
+  const _FilasColumnas({
+    required this.id,
+    required this.nombre,
+    required this.email,
+    required this.jerarquia,
+    required this.estado,
+    this.esCabecera = false,
+    this.estadoWidget,
+  });
+
+  final String id;
+  final String nombre;
+  final String email;
+  final String jerarquia;
+  final String estado;
+  final bool esCabecera;
+  final Widget? estadoWidget;
+
+  TextStyle? _estilo(BuildContext context) {
+    if (esCabecera) {
+      return Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: AppTheme.colorTexto.withValues(alpha: 0.55),
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          );
+    }
+    return Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: AppTheme.colorTexto,
+        );
+  }
+
+  TextStyle? _estiloNombre(BuildContext context) {
+    final base = _estilo(context);
+    if (esCabecera) return base;
+    return base?.copyWith(fontWeight: FontWeight.w500);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 40,
+          child: Text(id, style: _estilo(context), overflow: TextOverflow.ellipsis),
+        ),
+        Expanded(
+          flex: 3,
+          child: Text(
+            nombre,
+            style: _estiloNombre(context),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: Text(
+            email,
+            style: _estilo(context),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text(
+            jerarquia,
+            style: _estilo(context),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        SizedBox(
+          width: 96,
+          child: estadoWidget ??
+              Text(
+                estado,
+                style: _estilo(context),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.start,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
 class _FilaUsuario extends StatelessWidget {
   const _FilaUsuario({
     required this.usuario,
     required this.formatearFecha,
+    required this.vistaTabla,
     required this.onTap,
   });
 
   final UsuarioListado usuario;
   final String Function(DateTime?) formatearFecha;
+  final bool vistaTabla;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    if (vistaTabla) {
+      return Material(
+        color: AppTheme.colorFondo,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            height: 72,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            alignment: Alignment.centerLeft,
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: AppTheme.colorTexto.withValues(alpha: 0.06)),
+              ),
+            ),
+            child: _FilasColumnas(
+              id: '${usuario.id}',
+              nombre: usuario.nombreCompleto,
+              email: usuario.email,
+              jerarquia: usuario.roleNombre,
+              estado: '',
+              estadoWidget: _EstadoChip(activo: usuario.activo),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Material(
       color: AppTheme.colorFondo,
       child: ListTile(
