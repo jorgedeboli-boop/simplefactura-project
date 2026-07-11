@@ -9,6 +9,7 @@ import 'app_action_button.dart';
 
 enum ModuloApp {
   inicio('Inicio'),
+  datosEmpresa('Datos de la empresa'),
   usuarios('Usuarios'),
   clientes('Clientes'),
   proveedores('Proveedores'),
@@ -19,6 +20,22 @@ enum ModuloApp {
   const ModuloApp(this.titulo);
 
   final String titulo;
+
+  /// Items visibles en el menú lateral principal (sin submenús).
+  static const modulosPrincipales = <ModuloApp>[
+    ModuloApp.inicio,
+    ModuloApp.clientes,
+    ModuloApp.proveedores,
+    ModuloApp.presupuestos,
+    ModuloApp.facturas,
+    ModuloApp.configuracion,
+  ];
+
+  /// Submenú dentro de Configuración.
+  static const submodulosConfiguracion = <ModuloApp>[
+    ModuloApp.datosEmpresa,
+    ModuloApp.usuarios,
+  ];
 
   bool get esLista => switch (this) {
         ModuloApp.usuarios ||
@@ -47,7 +64,7 @@ abstract final class AppMenuLayout {
 }
 
 /// Contenido del menú lateral, reutilizable en drawer y en panel fijo.
-class AppMenuPanel extends StatelessWidget {
+class AppMenuPanel extends StatefulWidget {
   const AppMenuPanel({
     super.key,
     required this.moduloActual,
@@ -58,6 +75,35 @@ class AppMenuPanel extends StatelessWidget {
   final ModuloApp moduloActual;
   final ValueChanged<ModuloApp> onSeleccionar;
   final bool cerrarAlSeleccionar;
+
+  @override
+  State<AppMenuPanel> createState() => _AppMenuPanelState();
+}
+
+class _AppMenuPanelState extends State<AppMenuPanel> {
+  late bool _configuracionExpandida;
+
+  @override
+  void initState() {
+    super.initState();
+    _configuracionExpandida =
+        ModuloApp.submodulosConfiguracion.contains(widget.moduloActual);
+  }
+
+  @override
+  void didUpdateWidget(covariant AppMenuPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (ModuloApp.submodulosConfiguracion.contains(widget.moduloActual)) {
+      _configuracionExpandida = true;
+    }
+  }
+
+  void _seleccionar(ModuloApp modulo) {
+    widget.onSeleccionar(modulo);
+    if (widget.cerrarAlSeleccionar) {
+      Navigator.of(context).pop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,17 +149,22 @@ class AppMenuPanel extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  for (final modulo in ModuloApp.values)
-                    _ItemMenu(
-                      modulo: modulo,
-                      seleccionado: modulo == moduloActual,
-                      onTap: () {
-                        onSeleccionar(modulo);
-                        if (cerrarAlSeleccionar) {
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
+                  for (final modulo in ModuloApp.modulosPrincipales)
+                    if (modulo == ModuloApp.configuracion)
+                      _ItemMenuConfiguracion(
+                        expandido: _configuracionExpandida,
+                        moduloActivo: widget.moduloActual,
+                        onAlternar: () => setState(
+                          () => _configuracionExpandida = !_configuracionExpandida,
+                        ),
+                        onSeleccionarSubmodulo: _seleccionar,
+                      )
+                    else
+                      _ItemMenu(
+                        modulo: modulo,
+                        seleccionado: modulo == widget.moduloActual,
+                        onTap: () => _seleccionar(modulo),
+                      ),
                 ],
               ),
             ),
@@ -127,43 +178,43 @@ class AppMenuPanel extends StatelessWidget {
       ),
     );
   }
+}
 
-  static Future<void> _solicitarCerrarSesion(
-    BuildContext context,
-    AuthProvider auth,
-  ) async {
-    final navigator = Navigator.of(context, rootNavigator: true);
+Future<void> _solicitarCerrarSesion(
+  BuildContext context,
+  AuthProvider auth,
+) async {
+  final navigator = Navigator.of(context, rootNavigator: true);
 
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Cerrar sesión'),
-        content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          AppActionButton(
-            label: 'Cerrar sesión',
-            icon: Icons.logout,
-            expandido: false,
-            altura: 40,
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-          ),
-        ],
-      ),
-    );
+  final confirmar = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('Cerrar sesión'),
+      content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: const Text('Cancelar'),
+        ),
+        AppActionButton(
+          label: 'Cerrar sesión',
+          icon: Icons.logout,
+          expandido: false,
+          altura: 40,
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+        ),
+      ],
+    ),
+  );
 
-    if (confirmar != true) return;
+  if (confirmar != true) return;
 
-    await auth.cerrarSesion();
+  await auth.cerrarSesion();
 
-    navigator.pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-      (route) => false,
-    );
-  }
+  navigator.pushAndRemoveUntil(
+    MaterialPageRoute(builder: (_) => const LoginScreen()),
+    (route) => false,
+  );
 }
 
 class AppDrawer extends StatelessWidget {
@@ -186,6 +237,121 @@ class AppDrawer extends StatelessWidget {
         moduloActual: moduloActual,
         onSeleccionar: onSeleccionar,
         cerrarAlSeleccionar: true,
+      ),
+    );
+  }
+}
+
+class _ItemMenuConfiguracion extends StatelessWidget {
+  const _ItemMenuConfiguracion({
+    required this.expandido,
+    required this.moduloActivo,
+    required this.onAlternar,
+    required this.onSeleccionarSubmodulo,
+  });
+
+  final bool expandido;
+  final ModuloApp moduloActivo;
+  final VoidCallback onAlternar;
+  final ValueChanged<ModuloApp> onSeleccionarSubmodulo;
+
+  bool get _submoduloActivo =>
+      ModuloApp.submodulosConfiguracion.contains(moduloActivo);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onAlternar,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color: _submoduloActivo
+                        ? AppTheme.colorNavBar
+                        : Colors.transparent,
+                    width: 5,
+                  ),
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(20, 12, 12, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      ModuloApp.configuracion.titulo,
+                      style: AppTheme.textoDrawer.copyWith(
+                        fontWeight:
+                            _submoduloActivo ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    expandido ? Icons.expand_less : Icons.expand_more,
+                    color: Colors.white.withValues(alpha: 0.75),
+                    size: 22,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (expandido)
+          for (final submodulo in ModuloApp.submodulosConfiguracion)
+            _ItemSubMenu(
+              modulo: submodulo,
+              seleccionado: moduloActivo == submodulo,
+              onTap: () => onSeleccionarSubmodulo(submodulo),
+            ),
+      ],
+    );
+  }
+}
+
+class _ItemSubMenu extends StatelessWidget {
+  const _ItemSubMenu({
+    required this.modulo,
+    required this.seleccionado,
+    required this.onTap,
+  });
+
+  final ModuloApp modulo;
+  final bool seleccionado;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(
+                color: seleccionado ? AppTheme.colorNavBar : Colors.transparent,
+                width: 5,
+              ),
+            ),
+            color: seleccionado
+                ? Colors.white.withValues(alpha: 0.06)
+                : Colors.transparent,
+          ),
+          padding: const EdgeInsets.fromLTRB(36, 10, 20, 10),
+          child: Text(
+            modulo.titulo,
+            style: AppTheme.textoDrawer.copyWith(
+              fontWeight: seleccionado ? FontWeight.w600 : FontWeight.w400,
+              color: seleccionado
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.88),
+            ),
+          ),
+        ),
       ),
     );
   }

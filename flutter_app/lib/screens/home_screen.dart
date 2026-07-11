@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/app_nav_bar.dart';
+import 'empresa_ficha_screen.dart';
 import 'usuarios_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -157,6 +158,10 @@ class _ContenidoModulo extends StatelessWidget {
 
     if (modulo == ModuloApp.usuarios) {
       return UsuariosScreen(busqueda: busqueda);
+    }
+
+    if (modulo == ModuloApp.datosEmpresa) {
+      return const EmpresaFichaScreen();
     }
 
     return Center(
