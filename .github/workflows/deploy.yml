@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       force_full_deploy:
-        description: 'Subir todos los archivos (borra estado sync en servidor)'
+        description: 'Subir todos los archivos (borra archivos huérfanos en servidor)'
         required: false
         default: false
         type: boolean
@@ -38,10 +38,13 @@ jobs:
         run: |
           echo "Archivos generados:"
           find flutter_app/build/web -type f | wc -l
+          du -sh flutter_app/build/web
           ls -lh flutter_app/build/web/main.dart.js
-          ls -lh flutter_app/build/web/flutter_service_worker.js 2>/dev/null || true
 
-      - name: Deploy to FTP
+      - name: Preparar archivos críticos Flutter
+        run: bash scripts/prepare_critical_web.sh flutter_app/build/web /tmp/sf-critical
+
+      - name: Deploy incremental a FTP
         id: deploy_ftp
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -52,8 +55,8 @@ jobs:
           protocol: ftp
           local-dir: flutter_app/build/web/
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          state-name: .ftp-deploy-state-${{ github.run_id }}.json
-          log-level: verbose
+          state-name: .ftp-deploy-state.json
+          log-level: standard
           security: loose
           dangerous-clean-slate: ${{ github.event_name == 'workflow_dispatch' && inputs.force_full_deploy == true }}
           exclude: |
@@ -62,6 +65,22 @@ jobs:
             **/api/config/constantes.php
             **/_notes/**
             **/.DS_Store
+            **/.ftp-deploy-state*.json
+
+      - name: Subir archivos críticos Flutter
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
+          local-dir: /tmp/sf-critical/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          state-name: .ftp-deploy-critical.json
+          log-level: standard
+          security: loose
+          dangerous-clean-slate: false
 
       - name: Reintentar deploy FTP
         if: failure()
@@ -74,7 +93,7 @@ jobs:
           protocol: ftp
           local-dir: flutter_app/build/web/
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          state-name: .ftp-deploy-state-${{ github.run_id }}-retry.json
+          state-name: .ftp-deploy-state-retry.json
           log-level: verbose
           security: loose
           dangerous-clean-slate: false
