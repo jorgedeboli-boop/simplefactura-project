@@ -20,7 +20,11 @@ class EmpresaConfiguracion {
   final String? regimenIvaNombre;
   final String? regimenIvaPorcentaje;
   final String? logotipoUrl;
+  final String? logotipoFile;
+  final String? logotipoArchivoUrl;
   final String colorPrimario;
+  final int facturaDesign;
+  final String colorDesign;
   final String? ibanCuenta;
 
   EmpresaConfiguracion({
@@ -43,7 +47,11 @@ class EmpresaConfiguracion {
     this.regimenIvaNombre,
     this.regimenIvaPorcentaje,
     this.logotipoUrl,
+    this.logotipoFile,
+    this.logotipoArchivoUrl,
     required this.colorPrimario,
+    required this.facturaDesign,
+    required this.colorDesign,
     this.ibanCuenta,
   });
 
@@ -70,10 +78,24 @@ class EmpresaConfiguracion {
       regimenIvaNombre: json['regimen_iva_nombre'] as String?,
       regimenIvaPorcentaje: json['regimen_iva_porcentaje']?.toString(),
       logotipoUrl: json['logotipo_url'] as String?,
+      logotipoFile: json['logotipo_file'] as String?,
+      logotipoArchivoUrl: json['logotipo_archivo_url'] as String?,
       colorPrimario: json['color_primario'] as String? ?? '#398bf7',
+      facturaDesign: json['factura_design'] is int
+          ? json['factura_design'] as int
+          : int.tryParse(json['factura_design']?.toString() ?? '') ?? 1,
+      colorDesign: json['color_design'] as String? ??
+          json['color_primario'] as String? ??
+          '#398bf7',
       ibanCuenta: json['iban_cuenta'] as String?,
     );
   }
+
+  /// URL del logotipo para facturas (subido o externo).
+  String? get logotipoFacturaUrl =>
+      logotipoArchivoUrl?.isNotEmpty == true
+          ? logotipoArchivoUrl
+          : logotipoUrl;
 
   String get tituloFicha => nombreComercial?.trim().isNotEmpty == true
       ? nombreComercial!

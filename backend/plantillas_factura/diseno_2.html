@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Plantilla de Factura 2</title>
+<style>
+  /* ============================================================
+     COLOR Y LOGO - cambiar aca
+     ============================================================ */
+  :root {
+    --color-primary: #1cabc4;   /* <- color principal (banner, iconos, circulo, total) */
+    --color-negro: #191919;     /* cabecera de tabla y pie de pagina */
+    --color-texto: #6d6e70;
+    --color-heading: #2c2c2c;
+    --nombre-empresa: "TypoEdition";
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #ddd;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--color-texto);
+  }
+
+  .hoja {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    background: #f2f2f2;
+  }
+
+  /* ---------- Barra superior blanca ---------- */
+  .barra-superior {
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 14mm;
+  }
+  .marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  /* Logo por defecto (icono + texto). Para tu propio logo, reemplaza
+     este bloque por: <img src="tu-logo.png" style="height:32px;"> */
+  .logo-icono {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-icono svg { width: 16px; height: 16px; fill: #fff; }
+  .marca-texto { font-size: 15px; font-weight: 700; color: var(--color-heading); }
+
+  .contacto-rapido {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: var(--color-texto);
+  }
+  .contacto-rapido .icono-mini { background: var(--color-primary); }
+
+  /* ---------- Banner grande de color ---------- */
+  .banner {
+    background: var(--color-primary);
+    margin: 0 14mm;
+    padding: 26px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    color: #fff;
+  }
+  .banner .datos-empresa {
+    font-size: 11px;
+    line-height: 1.8;
+  }
+  .banner .titulo-invoice {
+    text-align: right;
+  }
+  .banner .titulo-invoice h1 {
+    margin: 0;
+    font-size: 46px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+  .banner .titulo-invoice .numero {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  /* ---------- Invoice to / datos ---------- */
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    padding: 26px 14mm 10px 14mm;
+  }
+  .meta-izquierda h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0 0 12px 0;
+  }
+  .meta-izquierda .dato-icono {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    margin-bottom: 8px;
+  }
+  .icono-mini {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .icono-mini svg { width: 10px; height: 10px; fill: #fff; }
+
+  .meta-derecha .fila-dato {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    margin-bottom: 8px;
+  }
+  .meta-derecha .fila-dato .etiqueta { color: var(--color-heading); font-weight: 600; min-width: 90px; }
+  .meta-derecha .fila-dato .valor { color: var(--color-texto); }
+
+  /* ---------- Tabla de items ---------- */
+  table.items {
+    width: calc(100% - 28mm);
+    margin: 14px 14mm 0 14mm;
+    border-collapse: collapse;
+  }
+  table.items thead th {
+    background: var(--color-negro);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+    padding: 11px 14px;
+  }
+  table.items thead th.col-centro { text-align: center; }
+  table.items thead th.col-der { text-align: right; }
+
+  table.items tbody td {
+    padding: 14px 14px;
+    font-size: 12px;
+    vertical-align: top;
+    border-bottom: 1px solid #d5d5d5;
+  }
+  table.items .item-titulo {
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 3px;
+  }
+  table.items .item-desc {
+    font-size: 10.5px;
+    color: var(--color-texto);
+    line-height: 1.4;
+    max-width: 360px;
+  }
+  table.items td.col-centro { text-align: center; }
+  table.items td.col-der { text-align: right; font-weight: 600; color: var(--color-heading); }
+
+  /* ---------- Notas + Totales ---------- */
+  .inferior {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 14mm 0 14mm;
+  }
+
+  .notas { max-width: 300px; }
+  .notas .terminos { font-size: 12px; color: var(--color-heading); margin-bottom: 20px; }
+  .notas .terminos b { font-weight: 700; }
+
+  .notas .pago {
+    display: flex;
+    gap: 8px;
+  }
+  .notas .pago h4 {
+    font-size: 12px;
+    color: var(--color-heading);
+    margin: 0 0 4px 0;
+  }
+  .notas .pago p {
+    font-size: 10px;
+    line-height: 1.5;
+    margin: 0;
+    color: var(--color-texto);
+  }
+
+  .totales { width: 300px; }
+  .totales .fila {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    padding: 10px 6px;
+    border-bottom: 1px solid #d5d5d5;
+  }
+  .totales .fila .etiqueta { color: var(--color-heading); font-weight: 600; }
+  .totales .total-final {
+    display: flex;
+    margin-top: 12px;
+  }
+  .totales .total-final .etiqueta {
+    flex: 1;
+    background: var(--color-negro);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 12px 16px;
+  }
+  .totales .total-final .valor {
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 12px 16px;
+    min-width: 110px;
+    text-align: right;
+  }
+
+  /* ---------- Agradecimiento + firma + QR ---------- */
+  .cierre {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 14mm 20px 14mm;
+  }
+
+  .gracias {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+  }
+  .gracias svg { width: 26px; height: 26px; fill: #fff; }
+  .gracias .titulo-gracias { font-size: 15px; font-weight: 700; }
+  .gracias .subtitulo-gracias { font-size: 9px; line-height: 1.3; padding: 0 14px; }
+
+  .firma { text-align: right; }
+  .firma .nombre { font-size: 13px; font-weight: 700; color: var(--color-heading); }
+  .firma .cargo { font-size: 10.5px; color: var(--color-texto); }
+
+  .qr {
+    width: 90px;
+    height: 90px;
+    margin-left: 20px;
+  }
+
+  /* ---------- Pie de pagina ---------- */
+  .pie {
+    background: var(--color-negro);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 14mm;
+    font-size: 10.5px;
+    margin-top: 10px;
+  }
+  .pie .marca-pie { display: flex; align-items: center; gap: 8px; }
+  .pie .marca-pie .logo-icono { width: 22px; height: 22px; }
+  .pie .marca-pie .logo-icono svg { width: 12px; height: 12px; }
+  .pie .col-pie { line-height: 1.6; }
+
+  .pie-inferior {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 14mm 20px 14mm;
+    font-size: 10px;
+    color: var(--color-texto);
+  }
+
+  @media print {
+    body { background: #fff; }
+    .hoja { margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="hoja">
+
+  <!-- BARRA SUPERIOR -->
+  <div class="barra-superior">
+    <div class="marca">
+      <div class="logo-icono">
+        <svg viewBox="0 0 24 24"><path d="M20 6h-4V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm-10-2h4v2h-4V4z"/></svg>
+      </div>
+      <div class="marca-texto">TypoEdition</div>
+    </div>
+    <div class="contacto-rapido">
+      <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.7 5 6.5 6.5l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1l-2.1 2.3z"/></svg></span>
+      DO YOU HAVE ANY QUESTIONS ? &nbsp;|&nbsp; 00 123 456 789 icipaena, consumi et hosum lanton
+    </div>
+  </div>
+
+  <!-- BANNER DE COLOR -->
+  <div class="banner">
+    <div class="datos-empresa">
+      Your Company, 99-785 City, Your Street 2397<br>
+      Phone: 97 567 87 87 55&nbsp;&nbsp; Fax: 97 567 87 87 57<br>
+      E-mail: office@yourbusiness.com
+    </div>
+    <div class="titulo-invoice">
+      <h1>Invoice</h1>
+      <div class="numero">000737</div>
+    </div>
+  </div>
+
+  <!-- INVOICE TO / DATOS -->
+  <div class="meta">
+    <div class="meta-izquierda">
+      <h3>Invoice to</h3>
+      <div class="dato-icono">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg></span>
+        Your Company, 99-785 City, Your Street 2397
+      </div>
+      <div class="dato-icono">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.7 5 6.5 6.5l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1l-2.1 2.3z"/></svg></span>
+        +99 123 456 789
+      </div>
+      <div class="dato-icono">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 6h-2.9a15.6 15.6 0 00-1.3-4.2A8 8 0 0118.9 8zM12 4c.8 1.1 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.9 1.9-4zM4.3 14a8 8 0 010-4h3.3a16.7 16.7 0 000 4H4.3zm.8 2h2.9c.3 1.5.7 2.9 1.3 4.2A8 8 0 015.1 16zm2.9-8H5.1a8 8 0 013.9-4.2A15.6 15.6 0 007.9 8zM12 20c-.8-1.1-1.5-2.5-1.9-4h3.8c-.4 1.5-1.1 2.9-1.9 4zm2.1-6H9.9a14.7 14.7 0 010-4h4.2a14.7 14.7 0 010 4zm.2 5.8c.6-1.3 1-2.7 1.3-4.2h2.9a8 8 0 01-4.2 4.2zM15.8 14a16.7 16.7 0 000-4h3.3a8 8 0 010 4z"/></svg></span>
+        www.yourbusiness.com
+      </div>
+    </div>
+    <div class="meta-derecha">
+      <div class="fila-dato">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span>
+        <span class="etiqueta">Invoice No:</span>
+        <span class="valor">000737</span>
+      </div>
+      <div class="fila-dato">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V10h14v10z"/></svg></span>
+        <span class="etiqueta">Invoice Date:</span>
+        <span class="valor">19th November 2026</span>
+      </div>
+      <div class="fila-dato">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.3-.6-3-1.2-3-2.1 0-1 1-1.7 2.6-1.7 1.4 0 2.2.6 2.5 1.7l1.9-.5c-.4-1.4-1.5-2.5-3.3-2.9V3.5h-2.2v1.9c-1.9.4-3.2 1.6-3.2 3.4 0 2.2 1.8 3.2 4.4 3.9 2.2.6 2.7 1.3 2.7 2.2 0 .7-.5 1.8-2.6 1.8-1.9 0-2.7-.8-2.9-1.9l-2 .5c.3 1.7 1.6 2.7 3.4 3.1v1.9h2.2v-1.8c2-.4 3.4-1.6 3.4-3.5 0-2.6-2.3-3.5-4.9-4.1z"/></svg></span>
+        <span class="etiqueta">Total Due:</span>
+        <span class="valor">$ 5,614.29</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA DE ITEMS -->
+  <table class="items">
+    <thead>
+      <tr>
+        <th style="width:46%;">Item Description</th>
+        <th class="col-centro" style="width:16%;">Quantity</th>
+        <th style="width:19%;">Unit Price</th>
+        <th class="col-der" style="width:19%;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="item-titulo">Item description loremus</div>
+          <div class="item-desc">Acipsani endelite doluptione non plant faceriaecus ulparum atis natur, voluptur, cor sunt quia di aut.</div>
+        </td>
+        <td class="col-centro">2</td>
+        <td>$ 875.00</td>
+        <td class="col-der">$ 1,750.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-titulo">Item description loremus</div>
+          <div class="item-desc">Acipsani endelite doluptione non plant faceriaecus ulparum atis natur, voluptur, cor sunt quia di aut.</div>
+        </td>
+        <td class="col-centro">1</td>
+        <td>$ 250.00</td>
+        <td class="col-der">$ 500.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-titulo">Item description loremus</div>
+          <div class="item-desc">Acipsani endelite doluptione non plant faceriaecus ulparum atis natur, voluptur, cor sunt quia di aut.</div>
+        </td>
+        <td class="col-centro">3</td>
+        <td>$ 999.00</td>
+        <td class="col-der">$ 2,997.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- NOTAS + TOTALES -->
+  <div class="inferior">
+    <div class="notas">
+      <div class="terminos"><b>Terms:</b> 30 days from issue</div>
+      <div class="pago">
+        <span class="icono-mini" style="margin-top:2px;"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4H4V6h16v2z"/></svg></span>
+        <div>
+          <h4>Payment Information</h4>
+          <p>Bihil ipsam earunt. Cus, comni quiandu et offic temporecus nonsequi ut quia que cust, siritu et perectorume nonse incid que volos et offic ciae ninciisto voloratur.<br><br>
+          Imperrum ius essed que volor sum quiaectur elur allam volorae.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="totales">
+      <div class="fila"><span class="etiqueta">Subtotal</span><span>$ 5,247.00</span></div>
+      <div class="fila"><span class="etiqueta">Tax VAT 7%</span><span>$ 367.29</span></div>
+      <div class="fila"><span class="etiqueta">Discount 0%</span><span></span></div>
+      <div class="total-final">
+        <div class="etiqueta">Total Due:</div>
+        <div class="valor">$ 5,614.29</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGRADECIMIENTO + FIRMA + QR -->
+  <div class="cierre">
+    <div class="gracias">
+      <svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.3l.9-4.4.1-.5c0-.4-.2-.8-.5-1.1L14.2 1 7.6 7.6C7.2 8 7 8.5 7 9v10c0 1.1.9 2 2 2h9c.8 0 1.5-.5 1.8-1.2l3-7c.1-.3.2-.5.2-.8v-2z"/></svg>
+      <div class="titulo-gracias">Thank you</div>
+      <div class="subtitulo-gracias">for your business</div>
+    </div>
+
+    <div class="firma">
+      <div class="nombre">Daniel Vanquisher</div>
+      <div class="cargo">Accounts Manager</div>
+    </div>
+
+    <svg class="qr" viewBox="0 0 29 29" shape-rendering="crispEdges">
+      <rect width="29" height="29" fill="#fff"/>
+      <g fill="#000">
+        <rect x="0" y="0" width="7" height="7"/><rect x="1" y="1" width="5" height="5" fill="#fff"/><rect x="2" y="2" width="3" height="3"/>
+        <rect x="22" y="0" width="7" height="7"/><rect x="23" y="1" width="5" height="5" fill="#fff"/><rect x="24" y="2" width="3" height="3"/>
+        <rect x="0" y="22" width="7" height="7"/><rect x="1" y="23" width="5" height="5" fill="#fff"/><rect x="2" y="24" width="3" height="3"/>
+        <rect x="9" y="1" width="1" height="1"/><rect x="11" y="1" width="2" height="1"/><rect x="15" y="1" width="1" height="1"/><rect x="18" y="1" width="1" height="1"/>
+        <rect x="9" y="3" width="2" height="2"/><rect x="13" y="3" width="1" height="2"/><rect x="16" y="3" width="2" height="1"/><rect x="19" y="3" width="1" height="2"/>
+        <rect x="8" y="8" width="2" height="1"/><rect x="11" y="8" width="1" height="2"/><rect x="14" y="8" width="2" height="2"/><rect x="18" y="8" width="1" height="1"/><rect x="20" y="8" width="2" height="2"/>
+        <rect x="0" y="9" width="2" height="1"/><rect x="4" y="9" width="1" height="2"/><rect x="9" y="10" width="1" height="1"/><rect x="12" y="10" width="2" height="1"/><rect x="16" y="10" width="1" height="2"/><rect x="22" y="9" width="2" height="1"/><rect x="26" y="9" width="2" height="2"/>
+        <rect x="2" y="11" width="1" height="2"/><rect x="6" y="11" width="2" height="1"/><rect x="10" y="12" width="2" height="2"/><rect x="14" y="12" width="1" height="1"/><rect x="18" y="12" width="2" height="1"/><rect x="24" y="11" width="1" height="2"/>
+        <rect x="0" y="13" width="1" height="2"/><rect x="4" y="13" width="2" height="2"/><rect x="8" y="14" width="1" height="1"/><rect x="12" y="14" width="1" height="2"/><rect x="16" y="14" width="2" height="1"/><rect x="20" y="14" width="1" height="2"/><rect x="26" y="13" width="2" height="1"/>
+        <rect x="2" y="16" width="2" height="1"/><rect x="6" y="16" width="1" height="2"/><rect x="10" y="17" width="2" height="1"/><rect x="14" y="17" width="1" height="2"/><rect x="18" y="17" width="2" height="2"/><rect x="24" y="16" width="1" height="1"/>
+        <rect x="9" y="19" width="1" height="1"/><rect x="12" y="19" width="2" height="2"/><rect x="16" y="19" width="1" height="1"/><rect x="20" y="19" width="2" height="1"/><rect x="26" y="18" width="2" height="2"/>
+        <rect x="8" y="21" width="2" height="1"/><rect x="12" y="21" width="1" height="2"/><rect x="15" y="21" width="2" height="1"/><rect x="19" y="21" width="1" height="2"/><rect x="22" y="21" width="2" height="2"/>
+        <rect x="9" y="24" width="7" height="1"/><rect x="17" y="24" width="1" height="3"/><rect x="19" y="24" width="2" height="1"/><rect x="22" y="24" width="1" height="3"/><rect x="24" y="24" width="3" height="1"/>
+        <rect x="9" y="26" width="1" height="2"/><rect x="12" y="26" width="2" height="2"/><rect x="20" y="26" width="1" height="2"/><rect x="26" y="26" width="2" height="2"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- PIE DE PAGINA -->
+  <div class="pie">
+    <div class="marca-pie">
+      <div class="logo-icono">
+        <svg viewBox="0 0 24 24"><path d="M20 6h-4V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm-10-2h4v2h-4V4z"/></svg>
+      </div>
+      <div class="col-pie">
+        <strong>TypoEdition</strong><br>
+        City Name, The street name 12345<br>
+        Postal Code 79 35 457
+      </div>
+    </div>
+    <div class="col-pie">
+      Telephone: 00 123 456 789<br>
+      Fax: 00 123 456 789
+    </div>
+    <div class="col-pie">
+      E-mail: office@company.com
+    </div>
+  </div>
+  <div class="pie-inferior">
+    <div>www.yourcompany.com</div>
+    <div>Cus, comni quiandu et offic temporecus nonsequi ut quia que voles et offic ciae ninciisto voloratur.</div>
+  </div>
+
+</div>
+</body>
+</html>

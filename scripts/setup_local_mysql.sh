@@ -61,6 +61,7 @@ mysql_root "$TENANT_DB" < "$DB_DIR/04_password_reset_tokens.sql" 2>/dev/null || 
 mysql_root "$TENANT_DB" < "$DB_DIR/05_users_conexions.sql" 2>/dev/null || true
 mysql_root "$TENANT_DB" < "$DB_DIR/04_seed_cliente_pruebas.sql"
 mysql_root "$TENANT_DB" < "$DB_DIR/06_empresa_tipo_empresa.sql" 2>/dev/null || true
+mysql_root "$TENANT_DB" < "$DB_DIR/07_empresa_factura_personalizacion.sql" 2>/dev/null || true
 
 mysql_root simplefactura_control <<SQL
 INSERT INTO tenants

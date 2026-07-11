@@ -9,6 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'PUT' && $_SERVER['REQUEST_METHOD'] !== 'POST
     responder_error('Metodo no permitido', 405);
 }
 
+require_once __DIR__ . '/../lib/plantilla_factura.php';
+
 $sesion = auth_requerir_sesion();
 $conexionTenant = db_conectar_tenant($sesion['tenant']);
 
@@ -22,7 +24,8 @@ $camposPermitidos = array(
     'direccion', 'ciudad', 'provincia_estado', 'codigo_postal',
     'telefono_principal', 'telefono_secundario', 'email_corporativo',
     'email_facturacion', 'sitio_web', 'moneda_codigo', 'regimen_iva_id',
-    'logotipo_url', 'color_primario', 'iban_cuenta',
+    'logotipo_url', 'logotipo_file', 'color_primario', 'factura_design', 'color_design',
+    'iban_cuenta',
 );
 
 $tiposValidosEmpresa = array('autonomo', 'sl', 'slu');
@@ -32,21 +35,46 @@ $tipos = '';
 $valores = array();
 
 foreach ($camposPermitidos as $campo) {
-    if (array_key_exists($campo, $entrada)) {
-        if ($campo === 'tipo_empresa') {
-            $tipo = limpiar_texto($entrada[$campo]);
-            if (!in_array($tipo, $tiposValidosEmpresa, true)) {
-                responder_error('Tipo de empresa no valido', 400);
-            }
-            $sets[] = "$campo = ?";
-            $tipos .= 's';
-            $valores[] = $tipo;
-            continue;
+    if (!array_key_exists($campo, $entrada)) {
+        continue;
+    }
+
+    if ($campo === 'tipo_empresa') {
+        $tipo = limpiar_texto($entrada[$campo]);
+        if (!in_array($tipo, $tiposValidosEmpresa, true)) {
+            responder_error('Tipo de empresa no valido', 400);
         }
         $sets[] = "$campo = ?";
         $tipos .= 's';
-        $valores[] = limpiar_texto($entrada[$campo]);
+        $valores[] = $tipo;
+        continue;
     }
+
+    if ($campo === 'factura_design') {
+        $diseno = (int) $entrada[$campo];
+        if ($diseno < 1 || $diseno > 3) {
+            responder_error('El diseno de factura debe ser 1, 2 o 3', 400);
+        }
+        $sets[] = "$campo = ?";
+        $tipos .= 'i';
+        $valores[] = $diseno;
+        continue;
+    }
+
+    if ($campo === 'color_design') {
+        $color = sf_normalizar_color_hex($entrada[$campo]);
+        if ($color === null) {
+            responder_error('Color de diseno no valido', 400);
+        }
+        $sets[] = "$campo = ?";
+        $tipos .= 's';
+        $valores[] = $color;
+        continue;
+    }
+
+    $sets[] = "$campo = ?";
+    $tipos .= 's';
+    $valores[] = limpiar_texto($entrada[$campo]);
 }
 
 if (count($sets) === 0) {

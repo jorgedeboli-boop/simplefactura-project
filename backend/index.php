@@ -13,8 +13,6 @@ require_once __DIR__ . '/lib/auth.php';
 require_once __DIR__ . '/lib/validacion.php';
 require_once __DIR__ . '/lib/utilidades.php';
 require_once __DIR__ . '/lib/conexiones.php';
-
-// CORS basico para la app Flutter (ajustar origen en produccion)
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Auth-Token');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -34,6 +32,8 @@ $rutas = array(
 
     'empresa_obtener'     => 'endpoints/empresa_obtener.php',
     'empresa_actualizar'  => 'endpoints/empresa_actualizar.php',
+    'empresa_logotipo_subir' => 'endpoints/empresa_logotipo_subir.php',
+    'empresa_factura_vista_previa' => 'endpoints/empresa_factura_vista_previa.php',
 
     'usuarios_listar'     => 'endpoints/usuarios_listar.php',
     'usuarios_crear'      => 'endpoints/usuarios_crear.php',

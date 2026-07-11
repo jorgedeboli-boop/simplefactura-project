@@ -32,6 +32,9 @@ dependencies:
   # Dropdowns con busqueda y multiseleccion
   dropdown_flutter: ^1.1.0
 
+  # Seleccion de logotipo (web, desktop, movil)
+  file_picker: ^8.0.0+1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

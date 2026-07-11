@@ -96,6 +96,15 @@ class ApiService {
     return _procesarRespuesta(respuesta);
   }
 
+  /// Construye la URI de una accion GET (p. ej. vista previa HTML en iframe).
+  Uri uriAccion(String accion, {Map<String, String>? parametros}) {
+    return Uri.parse(baseUrl).replace(queryParameters: {
+      'accion': accion,
+      ..._parametrosAuth(),
+      ...?parametros,
+    });
+  }
+
   dynamic _procesarRespuesta(http.Response respuesta) {
     final cuerpoCrudo = respuesta.body.trim();
     Map<String, dynamic> cuerpo;

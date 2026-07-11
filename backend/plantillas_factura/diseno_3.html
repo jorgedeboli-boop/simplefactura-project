@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Plantilla de Factura 3</title>
+<style>
+  /* ============================================================
+     COLOR Y LOGO - cambiar aca
+     ============================================================ */
+  :root {
+    --color-primary: #8dc63f;   /* <- color principal (barra, cinta, precios) */
+    --color-negro: #262626;
+    --color-texto: #6d6e70;
+    --color-gris-claro: #a9a9a9;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #e5e5e5;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--color-texto);
+  }
+
+  .hoja {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 14mm;
+  }
+
+  /* ---------- Encabezado: logo + barra ---------- */
+  .encabezado {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+
+  /* Logo por defecto (texto). Para tu propio logo, reemplaza este bloque
+     por: <img src="tu-logo.png" style="height:40px;"> */
+  .logo {
+    font-size: 30px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: var(--color-negro);
+  }
+  .logo .verde { color: var(--color-primary); }
+  .logo .dominio { font-size: 20px; font-weight: 400; color: var(--color-gris-claro); }
+
+  .barra-verde { flex: 1; height: 8px; background: var(--color-primary); }
+
+  /* ---------- Datos empresa + Invoice # ---------- */
+  .meta-superior {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 26px;
+  }
+
+  .datos-empresa .fila-icono {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12.5px;
+    margin-bottom: 7px;
+  }
+  .datos-empresa .icono-mini {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .datos-empresa .icono-mini svg { width: 16px; height: 16px; fill: var(--color-negro); }
+
+  .invoice-numero { text-align: right; }
+  .invoice-numero h1 {
+    margin: 0;
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--color-negro);
+  }
+  .invoice-numero h1 .num { color: var(--color-primary); }
+  .invoice-numero .fecha {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-negro);
+    margin-top: 6px;
+  }
+
+  /* ---------- Invoice to + Total due (cinta) ---------- */
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    margin-bottom: 40px;
+  }
+
+  .invoice-to {
+    display: flex;
+    gap: 14px;
+    max-width: 55%;
+  }
+  .invoice-to .barra-lateral { width: 4px; background: var(--color-primary); flex-shrink: 0; }
+  .invoice-to h3 { margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: var(--color-negro); }
+  .invoice-to p { margin: 0; font-size: 12px; line-height: 1.7; }
+
+  .cinta-total {
+    background: var(--color-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 30px;
+    clip-path: polygon(24px 0, 100% 0, 100% 100%, 0 100%);
+    height: fit-content;
+    align-self: center;
+  }
+  .cinta-total .etiqueta { font-size: 16px; }
+  .cinta-total .valor { font-size: 24px; font-weight: 800; }
+
+  /* ---------- Tabla de items ---------- */
+  .items-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 3px solid var(--color-primary);
+    padding-bottom: 10px;
+    margin-bottom: 2px;
+  }
+  .items-cabecera .cuadrito { width: 12px; height: 12px; background: var(--color-primary); flex-shrink: 0; }
+  .items-cabecera .col-desc { flex: 1; font-weight: 700; color: var(--color-primary); font-size: 15px; }
+  .items-cabecera .col { width: 110px; font-weight: 700; color: var(--color-primary); font-size: 15px; text-align: right; }
+
+  .items-caja { border: 2px solid var(--color-primary); border-top: none; }
+  .fila-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--color-primary);
+  }
+  .fila-item:last-child { border-bottom: none; }
+  .fila-item .col-desc { flex: 1; padding-right: 20px; }
+  .fila-item .col-desc .titulo { font-weight: 700; color: var(--color-negro); font-size: 13.5px; margin-bottom: 3px; }
+  .fila-item .col-desc .desc { font-size: 12px; color: var(--color-texto); line-height: 1.5; }
+  .fila-item .col { width: 110px; text-align: right; font-size: 13px; color: var(--color-negro); }
+
+  /* ---------- Pago + totales ---------- */
+  .inferior {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 26px;
+  }
+
+  .metodo-pago {
+    background: #efefef;
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-negro);
+  }
+
+  .totales { width: 320px; }
+  .totales .fila {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-negro);
+    padding: 8px 2px;
+  }
+  .totales .linea-punteada { border-bottom: 2px dotted var(--color-negro); margin: 2px 0; }
+  .totales .fila.total-final { font-size: 15px; }
+
+  /* ---------- Firma ---------- */
+  .firma { margin-top: 30px; }
+  .firma .cargo { font-size: 12px; color: var(--color-texto); }
+  .firma .nombre { font-size: 13px; font-weight: 700; color: var(--color-negro); margin: 2px 0 8px 0; }
+  .firma .rubrica { font-family: 'Brush Script MT', cursive; font-size: 30px; color: #3f6fd1; margin: 0 0 10px 0; }
+  .firma .gracias { font-size: 13px; font-weight: 700; color: var(--color-negro); }
+
+  /* ---------- Terminos ---------- */
+  .terminos { margin-top: 70px; font-size: 11px; color: var(--color-gris-claro); }
+  .terminos b { color: var(--color-texto); }
+
+  /* ---------- Pie de pagina ---------- */
+  .pie {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-top: 1px solid #ddd;
+    margin-top: 30px;
+    padding-top: 16px;
+  }
+  .pie .logo { font-size: 22px; color: var(--color-gris-claro); }
+  .pie .logo .verde { color: var(--color-gris-claro); }
+  .pie .logo .dominio { color: var(--color-gris-claro); font-size: 15px; }
+  .pie .datos-pie { font-size: 11px; line-height: 1.6; color: var(--color-texto); }
+
+  @media print {
+    body { background: #fff; }
+    .hoja { margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="hoja">
+
+  <!-- ENCABEZADO -->
+  <div class="encabezado">
+    <div class="logo">viet<span class="verde">we</span><span class="dominio">.com</span></div>
+    <div class="barra-verde"></div>
+  </div>
+
+  <!-- DATOS EMPRESA + INVOICE # -->
+  <div class="meta-superior">
+    <div class="datos-empresa">
+      <div class="fila-icono">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg></span>
+        <div>Vietwe Solution Inc.<br>999 Conway Blvd.</div>
+      </div>
+      <div class="fila-icono">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg></span>
+        Los Angeles, California 90999, United States
+      </div>
+      <div class="fila-icono">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.7 5 6.5 6.5l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1l-2.1 2.3z"/></svg></span>
+        84 - 973 378 001
+      </div>
+      <div class="fila-icono">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></span>
+        datnv.it3@gmail.com
+      </div>
+    </div>
+    <div class="invoice-numero">
+      <h1>INVOICE <span class="num">#8866</span></h1>
+      <div class="fecha">Invoice Date Aug 4, 2026</div>
+    </div>
+  </div>
+
+  <!-- INVOICE TO + TOTAL DUE -->
+  <div class="meta">
+    <div class="invoice-to">
+      <div class="barra-lateral"></div>
+      <div>
+        <h3>INVOICE TO MR. DAT</h3>
+        <p>Nguyen Xa, Minh Khai, Tu Liem&nbsp; Ha Noi, Vietnam - 00000<br>
+        xdesky@vietwe.com&nbsp; |&nbsp; 84 - 973 378 001</p>
+      </div>
+    </div>
+    <div class="cinta-total">
+      <span class="etiqueta">Total Due:</span>
+      <span class="valor">$9,402.75</span>
+    </div>
+  </div>
+
+  <!-- TABLA DE ITEMS -->
+  <div class="items-cabecera">
+    <div class="cuadrito"></div>
+    <div class="col-desc">Item Description</div>
+    <div class="col">Unit Price</div>
+    <div class="col">Quantity</div>
+    <div class="col">Total</div>
+  </div>
+  <div class="items-caja">
+    <div class="fila-item">
+      <div class="col-desc">
+        <div class="titulo">Wordpress Design</div>
+        <div class="desc">Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</div>
+      </div>
+      <div class="col">$100.00</div>
+      <div class="col">40 H</div>
+      <div class="col">$4,000.00</div>
+    </div>
+    <div class="fila-item">
+      <div class="col-desc">
+        <div class="titulo">UX/UI Design</div>
+        <div class="desc">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod.</div>
+      </div>
+      <div class="col">$200.00</div>
+      <div class="col">20 H</div>
+      <div class="col">$4,000.00</div>
+    </div>
+    <div class="fila-item">
+      <div class="col-desc">
+        <div class="titulo">FrontEnd Develroper</div>
+        <div class="desc">Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</div>
+      </div>
+      <div class="col">$955.00</div>
+      <div class="col">1 H</div>
+      <div class="col">$955.00</div>
+    </div>
+  </div>
+
+  <!-- PAGO + TOTALES -->
+  <div class="inferior">
+    <div class="metodo-pago">Payment Method: Paypal, Visa Mastercard</div>
+    <div class="totales">
+      <div class="fila"><span>SUB TOTAL</span><span>$8,955.00</span></div>
+      <div class="linea-punteada"></div>
+      <div class="fila"><span>TAX VAT 10%</span><span>$895.50</span></div>
+      <div class="fila"><span>DISCOUNT 5%</span><span>$447.75</span></div>
+      <div class="linea-punteada"></div>
+      <div class="fila total-final"><span>TOTAL DUE</span><span>$9,402.75</span></div>
+    </div>
+  </div>
+
+  <!-- FIRMA -->
+  <div class="firma">
+    <div class="cargo">Accounts Manager</div>
+    <div class="nombre">DAT NGUYEN</div>
+    <div class="rubrica">Dat Nguyen</div>
+    <div class="gracias">Thank you for your business!</div>
+  </div>
+
+  <!-- TERMINOS -->
+  <div class="terminos"><b>Terms:</b> Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod.</div>
+
+  <!-- PIE DE PAGINA -->
+  <div class="pie">
+    <div class="logo">viet<span class="verde">we</span><span class="dominio">.com</span></div>
+    <div class="datos-pie">
+      Vietwe Solution Inc. 999 Conway Blvd.<br>
+      Los Angeles, California 90999, United States<br>
+      84 - 973 378 001 | datnv.it3@gmail.com
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

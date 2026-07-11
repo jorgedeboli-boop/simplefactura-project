@@ -8,6 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     responder_error('Metodo no permitido', 405);
 }
 
+require_once __DIR__ . '/../lib/plantilla_factura.php';
+
 $sesion = auth_requerir_sesion();
 $conexionTenant = db_conectar_tenant($sesion['tenant']);
 
@@ -26,4 +28,6 @@ if (count($filas) === 0) {
     responder_error('La empresa aun no tiene configuracion registrada', 404);
 }
 
-responder_json($filas[0]);
+$fila = sf_enriquecer_empresa_logotipo($filas[0], $sesion['tenant']['identificador']);
+
+responder_json($fila);

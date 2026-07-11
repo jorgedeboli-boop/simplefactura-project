@@ -10,6 +10,7 @@ import 'app_action_button.dart';
 enum ModuloApp {
   inicio('Inicio'),
   datosEmpresa('Datos de la empresa'),
+  personalizarFactura('Personalizar factura'),
   usuarios('Usuarios'),
   clientes('Clientes'),
   proveedores('Proveedores'),
@@ -34,6 +35,7 @@ enum ModuloApp {
   /// Submenú dentro de Configuración.
   static const submodulosConfiguracion = <ModuloApp>[
     ModuloApp.datosEmpresa,
+    ModuloApp.personalizarFactura,
     ModuloApp.usuarios,
   ];
 

@@ -15,6 +15,9 @@ define('SF_RECUPERACION_HORAS_EXPIRACION', 24);
 define('SF_APP_URL', 'https://my.simplefactura.app');
 define('SF_CORREO_REMITENTE', 'noreply@simplefactura.app');
 
+// Carpeta de archivos subidos por tenant (logotipos, etc.)
+define('SF_UPLOADS_DIR', __DIR__ . '/../uploads');
+
 date_default_timezone_set('UTC');
 
 // true en local para ver detalles de errores de BD en JSON (nunca en produccion)
