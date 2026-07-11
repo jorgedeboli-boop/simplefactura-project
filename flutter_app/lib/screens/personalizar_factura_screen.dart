@@ -8,6 +8,7 @@ import '../services/empresa_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/factura_plantilla_local.dart';
 import '../utils/factura_preview.dart';
+import '../utils/platform_view_guard.dart';
 import '../widgets/app_action_button.dart';
 
 class PersonalizarFacturaScreen extends StatefulWidget {
@@ -55,6 +56,13 @@ class _PersonalizarFacturaScreenState extends State<PersonalizarFacturaScreen>
   void initState() {
     super.initState();
     _tabs = TabController(length: 2, vsync: this);
+    _tabs.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (!_tabs.indexIsChanging && mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -68,6 +76,7 @@ class _PersonalizarFacturaScreenState extends State<PersonalizarFacturaScreen>
 
   @override
   void dispose() {
+    _tabs.removeListener(_onTabChanged);
     _tabs.dispose();
     super.dispose();
   }
@@ -244,7 +253,7 @@ class _PersonalizarFacturaScreenState extends State<PersonalizarFacturaScreen>
             controller: _tabs,
             children: [
               _pestanaLogotipo(),
-              _pestanaModelo(),
+              _pestanaModelo(mostrarPreviews: _tabs.index == 1),
             ],
           ),
         ),
@@ -334,7 +343,7 @@ class _PersonalizarFacturaScreenState extends State<PersonalizarFacturaScreen>
     );
   }
 
-  Widget _pestanaModelo() {
+  Widget _pestanaModelo({required bool mostrarPreviews}) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
       children: [
@@ -383,6 +392,7 @@ class _PersonalizarFacturaScreenState extends State<PersonalizarFacturaScreen>
             seleccionado: _disenoSeleccionado == diseno.$1,
             color: _colorDesign,
             logoUrl: _logotipoUrl,
+            mostrarPreview: mostrarPreviews,
             onTap: () => setState(() => _disenoSeleccionado = diseno.$1),
           ),
           const SizedBox(height: 16),
@@ -461,9 +471,11 @@ class _MuestraColorPersonalizado extends StatelessWidget {
 
   Future<void> _abrirSelector(BuildContext context) async {
     final controller = TextEditingController(text: hexActual);
-    final resultado = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
+    final resultado = await conPlatformViewsOcultos(
+      () => showDialog<String>(
+        context: context,
+        useRootNavigator: true,
+        builder: (context) => AlertDialog(
         title: const Text('Color personalizado'),
         content: TextField(
           controller: controller,
@@ -484,6 +496,7 @@ class _MuestraColorPersonalizado extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
     if (resultado != null && resultado.isNotEmpty) {
       onElegir(resultado.startsWith('#') ? resultado : '#$resultado');
@@ -516,6 +529,7 @@ class _TarjetaDiseno extends StatelessWidget {
     required this.seleccionado,
     required this.color,
     required this.logoUrl,
+    required this.mostrarPreview,
     required this.onTap,
   });
 
@@ -525,6 +539,7 @@ class _TarjetaDiseno extends StatelessWidget {
   final bool seleccionado;
   final String color;
   final String? logoUrl;
+  final bool mostrarPreview;
   final VoidCallback onTap;
 
   @override
@@ -585,10 +600,11 @@ class _TarjetaDiseno extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               _VistaPreviaDiseno(
-                key: ValueKey('$numero|$color|${logoUrl ?? ''}'),
+                key: ValueKey('$numero|$color|${logoUrl ?? ''}|$mostrarPreview'),
                 diseno: numero,
                 color: color,
                 logoUrl: logoUrl,
+                activo: mostrarPreview,
               ),
             ],
           ),
@@ -604,11 +620,13 @@ class _VistaPreviaDiseno extends StatefulWidget {
     required this.diseno,
     required this.color,
     this.logoUrl,
+    this.activo = true,
   });
 
   final int diseno;
   final String color;
   final String? logoUrl;
+  final bool activo;
 
   @override
   State<_VistaPreviaDiseno> createState() => _VistaPreviaDisenoState();
@@ -665,9 +683,15 @@ class _VistaPreviaDisenoState extends State<_VistaPreviaDiseno> {
             ),
           );
         }
-        return construirVistaPreviaFactura(
-          html: snapshot.data!,
-          height: 220,
+        return ValueListenableBuilder<bool>(
+          valueListenable: PlatformViewGuard.ocultar,
+          builder: (context, ocultarIframes, _) {
+            return construirVistaPreviaFactura(
+              html: snapshot.data!,
+              height: 220,
+              activo: widget.activo && !ocultarIframes,
+            );
+          },
         );
       },
     );

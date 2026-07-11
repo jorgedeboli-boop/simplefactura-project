@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../screens/login_screen.dart';
 import '../theme/app_theme.dart';
 import 'app_action_button.dart';
+import '../utils/platform_view_guard.dart';
 
 enum ModuloApp {
   inicio('Inicio'),
@@ -188,24 +189,27 @@ Future<void> _solicitarCerrarSesion(
 ) async {
   final navigator = Navigator.of(context, rootNavigator: true);
 
-  final confirmar = await showDialog<bool>(
-    context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: const Text('Cerrar sesión'),
-      content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: const Text('Cancelar'),
-        ),
-        AppActionButton(
-          label: 'Cerrar sesión',
-          icon: Icons.logout,
-          expandido: false,
-          altura: 40,
-          onPressed: () => Navigator.of(dialogContext).pop(true),
-        ),
-      ],
+  final confirmar = await conPlatformViewsOcultos(
+    () => showDialog<bool>(
+      context: context,
+      useRootNavigator: true,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cerrar sesión'),
+        content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          AppActionButton(
+            label: 'Cerrar sesión',
+            icon: Icons.logout,
+            expandido: false,
+            altura: 40,
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+          ),
+        ],
+      ),
     ),
   );
 
