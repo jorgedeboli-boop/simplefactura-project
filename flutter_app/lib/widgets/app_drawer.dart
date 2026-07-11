@@ -118,6 +118,8 @@ class AppDrawer extends StatelessWidget {
   }
 
   Future<void> _solicitarCerrarSesion(BuildContext context, AuthProvider auth) async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -136,15 +138,11 @@ class AppDrawer extends StatelessWidget {
       ),
     );
 
-    if (!context.mounted) return;
-    Navigator.of(context).pop();
-
-    if (confirmar != true || !context.mounted) return;
+    if (confirmar != true) return;
 
     await auth.cerrarSesion();
-    if (!context.mounted) return;
 
-    Navigator.of(context).pushAndRemoveUntil(
+    navigator.pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
     );

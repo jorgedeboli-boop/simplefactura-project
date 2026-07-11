@@ -29,6 +29,9 @@ dependencies:
   pdf: ^3.12.0
   excel: ^4.0.6
 
+  # Dropdowns con busqueda y multiseleccion
+  dropdown_flutter: ^1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

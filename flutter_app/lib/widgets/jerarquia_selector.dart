@@ -1,3 +1,4 @@
+import 'package:dropdown_flutter/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 
 import '../models/rol.dart';
@@ -5,7 +6,26 @@ import '../theme/app_theme.dart';
 
 enum JerarquiaSelectorEstilo { pill, campo }
 
-/// Selector de jerarquía con menú Material (`MenuAnchor`), no `<select>` HTML.
+class _OpcionJerarquia {
+  const _OpcionJerarquia(this.id, this.nombre);
+
+  final int? id;
+  final String nombre;
+
+  @override
+  String toString() => nombre;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is _OpcionJerarquia && id == other.id && nombre == other.nombre;
+  }
+
+  @override
+  int get hashCode => Object.hash(id, nombre);
+}
+
+/// Selector de jerarquía basado en [DropdownFlutter].
 class JerarquiaSelector extends StatelessWidget {
   const JerarquiaSelector({
     super.key,
@@ -32,180 +52,147 @@ class JerarquiaSelector extends StatelessWidget {
   final JerarquiaSelectorEstilo estilo;
   final double anchoMaximo;
 
-  String _textoSeleccionado() {
-    if (valor == null) {
-      if (mostrarOpcionTodos) return textoPlaceholder;
-      return 'Seleccionar';
+  List<_OpcionJerarquia> get _opciones {
+    final opciones = <_OpcionJerarquia>[];
+    if (mostrarOpcionTodos) {
+      opciones.add(_OpcionJerarquia(null, opcionTodosLabel));
     }
     for (final rol in roles) {
-      if (rol.id == valor) return rol.nombre;
+      opciones.add(_OpcionJerarquia(rol.id, rol.nombre));
     }
-    return '—';
+    return opciones;
   }
 
-  void _alternarMenu(MenuController controller) {
-    if (!habilitado) return;
-    if (controller.isOpen) {
-      controller.close();
-    } else {
-      controller.open();
+  _OpcionJerarquia? get _opcionInicial {
+    final opciones = _opciones;
+    if (opciones.isEmpty) return null;
+
+    if (valor == null) {
+      return mostrarOpcionTodos ? opciones.first : null;
     }
+
+    for (final opcion in opciones) {
+      if (opcion.id == valor) return opcion;
+    }
+    return null;
+  }
+
+  CustomDropdownDecoration get _decoracionPill {
+    const radio = BorderRadius.all(Radius.circular(20));
+    const iconoFlecha = Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 20);
+
+    return CustomDropdownDecoration(
+      closedFillColor: AppTheme.colorNavBar,
+      expandedFillColor: Colors.white,
+      closedBorderRadius: radio,
+      expandedBorderRadius: const BorderRadius.all(Radius.circular(12)),
+      headerStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 14.4,
+        fontWeight: FontWeight.w500,
+      ),
+      hintStyle: TextStyle(
+        color: Colors.white.withValues(alpha: 0.85),
+        fontSize: 14.4,
+        fontWeight: FontWeight.w500,
+      ),
+      listItemStyle: const TextStyle(
+        color: AppTheme.colorTexto,
+        fontSize: 14,
+      ),
+      closedSuffixIcon: iconoFlecha,
+      expandedSuffixIcon: Icon(
+        Icons.keyboard_arrow_up,
+        color: AppTheme.colorTexto.withValues(alpha: 0.55),
+        size: 20,
+      ),
+      listItemDecoration: ListItemDecoration(
+        selectedColor: AppTheme.colorPrimario.withValues(alpha: 0.08),
+        highlightColor: AppTheme.colorTexto.withValues(alpha: 0.04),
+      ),
+    );
+  }
+
+  CustomDropdownDecoration get _decoracionCampo {
+    return CustomDropdownDecoration(
+      closedFillColor: Colors.white,
+      expandedFillColor: Colors.white,
+      closedBorderRadius: BorderRadius.circular(10),
+      expandedBorderRadius: BorderRadius.circular(10),
+      closedBorder: Border.all(color: AppTheme.colorTexto.withValues(alpha: 0.25)),
+      expandedBorder: Border.all(color: AppTheme.colorPrimario),
+      headerStyle: ThemeData.light().textTheme.bodyLarge?.copyWith(
+            color: AppTheme.colorTexto,
+          ),
+      hintStyle: ThemeData.light().textTheme.bodyLarge?.copyWith(
+            color: AppTheme.colorTexto.withValues(alpha: 0.45),
+          ),
+      listItemStyle: const TextStyle(
+        color: AppTheme.colorTexto,
+        fontSize: 14,
+      ),
+      closedSuffixIcon: Icon(
+        Icons.keyboard_arrow_down,
+        color: AppTheme.colorTexto.withValues(alpha: 0.45),
+      ),
+      expandedSuffixIcon: Icon(
+        Icons.keyboard_arrow_up,
+        color: AppTheme.colorTexto.withValues(alpha: 0.45),
+      ),
+      listItemDecoration: ListItemDecoration(
+        selectedColor: AppTheme.colorPrimario.withValues(alpha: 0.08),
+        highlightColor: AppTheme.colorTexto.withValues(alpha: 0.04),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final texto = _textoSeleccionado();
+    final opciones = _opciones;
+    final esPill = estilo == JerarquiaSelectorEstilo.pill;
+    final hint = esPill ? textoPlaceholder : label;
+
+    final dropdown = DropdownFlutter<_OpcionJerarquia>(
+      hintText: hint,
+      items: opciones,
+      initialItem: _opcionInicial,
+      enabled: habilitado && opciones.isNotEmpty,
+      excludeSelected: false,
+      closedHeaderPadding: esPill
+          ? const EdgeInsets.symmetric(horizontal: 16, vertical: 10)
+          : const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      decoration: esPill ? _decoracionPill : _decoracionCampo,
+      onChanged: (opcion) => onChanged(opcion?.id),
+    );
+
+    final contenido = esPill
+        ? Theme(
+            data: Theme.of(context).copyWith(
+              inputDecorationTheme: const InputDecorationTheme(
+                filled: false,
+                fillColor: Colors.transparent,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+                isDense: true,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: dropdown,
+            ),
+          )
+        : dropdown;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: estilo == JerarquiaSelectorEstilo.pill ? anchoMaximo : double.infinity,
+        maxWidth: esPill ? anchoMaximo : double.infinity,
       ),
-      child: MenuAnchor(
-      style: MenuStyle(
-        visualDensity: VisualDensity.compact,
-        padding: WidgetStateProperty.all(EdgeInsets.zero),
-      ),
-      alignmentOffset: const Offset(0, 4),
-      builder: (context, controller, child) {
-        if (estilo == JerarquiaSelectorEstilo.pill) {
-          return _BotonPill(
-            texto: texto,
-            abierto: controller.isOpen,
-            habilitado: habilitado,
-            onTap: () => _alternarMenu(controller),
-          );
-        }
-
-        return Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _alternarMenu(controller),
-            borderRadius: BorderRadius.circular(10),
-            child: InputDecorator(
-              decoration: InputDecoration(
-                labelText: label,
-                suffixIcon: Icon(
-                  controller.isOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                  color: AppTheme.colorTexto.withValues(alpha: 0.45),
-                ),
-              ),
-              child: Text(
-                texto,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: habilitado
-                          ? AppTheme.colorTexto
-                          : AppTheme.colorTexto.withValues(alpha: 0.45),
-                    ),
-              ),
-            ),
-          ),
-        );
-      },
-      menuChildren: [
-        if (mostrarOpcionTodos)
-          _OpcionMenu(
-            seleccionado: valor == null,
-            etiqueta: opcionTodosLabel,
-            onTap: () => onChanged(null),
-          ),
-        for (final rol in roles)
-          _OpcionMenu(
-            seleccionado: valor == rol.id,
-            etiqueta: rol.nombre,
-            onTap: () => onChanged(rol.id),
-          ),
-      ],
-    ),
-    );
-  }
-}
-
-class _BotonPill extends StatelessWidget {
-  const _BotonPill({
-    required this.texto,
-    required this.abierto,
-    required this.habilitado,
-    required this.onTap,
-  });
-
-  final String texto;
-  final bool abierto;
-  final bool habilitado;
-  final VoidCallback onTap;
-
-  static const _altura = 40.0;
-  static const _estiloTexto = TextStyle(
-    color: Colors.white,
-    fontSize: 14.4, // 0.9rem
-    fontWeight: FontWeight.w500,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: habilitado
-          ? AppTheme.colorNavBar
-          : AppTheme.colorNavBar.withValues(alpha: 0.5),
-      borderRadius: BorderRadius.circular(_altura / 2),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: habilitado ? onTap : null,
-        child: SizedBox(
-          width: double.infinity,
-          height: _altura,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    texto,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: _estiloTexto,
-                  ),
-                ),
-                Icon(
-                  abierto ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OpcionMenu extends StatelessWidget {
-  const _OpcionMenu({
-    required this.seleccionado,
-    required this.etiqueta,
-    required this.onTap,
-  });
-
-  final bool seleccionado;
-  final String etiqueta;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return MenuItemButton(
-      onPressed: onTap,
-      child: Row(
-        children: [
-          SizedBox(
-            width: 20,
-            child: seleccionado
-                ? const Icon(Icons.check, size: 18, color: AppTheme.colorPrimario)
-                : null,
-          ),
-          const SizedBox(width: 8),
-          Expanded(child: Text(etiqueta)),
-        ],
-      ),
+      child: contenido,
     );
   }
 }
