@@ -56,6 +56,7 @@ class SelectorTipoEmpresa extends StatelessWidget {
     );
   }
 
+  /// Quita el borde/fondo del [InputDecorator] interno de [DropdownFlutter].
   Widget _sinDecoracionInput(BuildContext context, Widget child) {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -94,24 +95,31 @@ class SelectorTipoEmpresa extends StatelessWidget {
       },
     );
 
-    return InputDecorator(
-      decoration: InputDecoration(
-        labelText: label,
-        contentPadding: EdgeInsets.zero,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: _sinDecoracionInput(context, dropdown),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
+        Positioned(
+          left: 12,
+          top: 0,
+          child: ColoredBox(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.colorTexto.withValues(alpha: 0.65),
+                ),
+              ),
+            ),
+          ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      child: _sinDecoracionInput(context, dropdown),
+      ],
     );
   }
 }
