@@ -2,6 +2,38 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "🐘 API PHP local",
+      "type": "shell",
+      "command": "bash",
+      "args": ["${workspaceFolder}/scripts/serve_api.sh"],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "php",
+        "pattern": { "regexp": "^.*$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "==> API local",
+          "endsPattern": "Ctrl\\+C para detener"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+    {
+      "label": "🌐 Dev web (API + Flutter)",
+      "type": "shell",
+      "command": "bash",
+      "args": ["${workspaceFolder}/scripts/dev_web.sh"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+    {
       "label": "🚀 Deploy a servidores",
       "type": "shell",
       "command": "bash",

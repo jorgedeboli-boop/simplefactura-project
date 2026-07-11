@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter web (API local)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}/flutter_app",
+      "args": [
+        "-d",
+        "chrome",
+        "--dart-define=API_BASE_URL=http://localhost:8080/index.php"
+      ],
+      "preLaunchTask": "🐘 API PHP local"
+    },
+    {
+      "name": "Flutter web (producción)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}/flutter_app",
+      "args": [
+        "-d",
+        "chrome"
+      ]
+    }
+  ],
+  "compounds": []
+}

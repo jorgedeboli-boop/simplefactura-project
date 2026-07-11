@@ -15,8 +15,12 @@ class ApiException implements Exception {
 /// El backend expone una unica accion por endpoint y siempre responde JSON
 /// con la forma { "ok": true, "data": ... } o { "ok": false, "error": "..." }.
 class ApiService {
-  // Cambiar por la URL real del backend en produccion.
-  static const String baseUrl = 'https://my.simplefactura.app/api/index.php';
+  /// Producción por defecto. En local:
+  /// flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8080/index.php
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://my.simplefactura.app/api/index.php',
+  );
 
   String? _token;
   String? Function()? _obtenerToken;
