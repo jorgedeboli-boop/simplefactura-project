@@ -228,7 +228,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                 onExportarPdf: () => _exportar(filtrados, pdf: true),
                 onExportarExcel: () => _exportar(filtrados, pdf: false),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 17),
               _ChipsResumen(
                 totalUsuarios: _usuarios.length,
                 totalBloqueados: _totalBloqueados,
@@ -236,7 +236,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 17),
         Expanded(
           child: _usuarios.isEmpty
               ? const _ListaVacia()
