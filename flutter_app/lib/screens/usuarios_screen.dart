@@ -35,7 +35,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
   bool _inicializado = false;
 
   static const _alturaFila = 72.0;
-  static const _anchoVistaTabla = 1200.0;
+  static const _anchoVistaTabla = 1350.0;
   static final _formatoFecha = DateFormat('dd/MM/yyyy HH:mm');
   final _exportService = UsuariosExportService(formatoFecha: _formatoFecha);
 
@@ -480,6 +480,7 @@ class _CabeceraListado extends StatelessWidget {
         nombre: 'Nombre',
         email: 'Email',
         jerarquia: 'Jerarquía',
+        ultimaConexion: 'Última conexión',
         estado: 'Estado',
         esCabecera: true,
       ),
@@ -493,6 +494,7 @@ class _FilasColumnas extends StatelessWidget {
     required this.nombre,
     required this.email,
     required this.jerarquia,
+    required this.ultimaConexion,
     required this.estado,
     this.esCabecera = false,
     this.estadoWidget,
@@ -502,6 +504,7 @@ class _FilasColumnas extends StatelessWidget {
   final String nombre;
   final String email;
   final String jerarquia;
+  final String ultimaConexion;
   final String estado;
   final bool esCabecera;
   final Widget? estadoWidget;
@@ -560,8 +563,17 @@ class _FilasColumnas extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+        Expanded(
+          flex: 2,
+          child: Text(
+            ultimaConexion,
+            style: _estilo(context),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         SizedBox(
-          width: 96,
+          width: 88,
           child: estadoWidget ??
               Text(
                 estado,
@@ -610,6 +622,7 @@ class _FilaUsuario extends StatelessWidget {
               nombre: usuario.nombreCompleto,
               email: usuario.email,
               jerarquia: usuario.roleNombre,
+              ultimaConexion: formatearFecha(usuario.fechaUltimaConexion),
               estado: '',
               estadoWidget: _EstadoChip(activo: usuario.activo),
             ),
@@ -639,7 +652,7 @@ class _FilaUsuario extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w500),
         ),
         subtitle: Text(
-          '${usuario.email} · ${usuario.roleNombre} · Último acceso: ${formatearFecha(usuario.ultimoAcceso)}',
+          '${usuario.email} · ${usuario.roleNombre} · Última conexión: ${formatearFecha(usuario.fechaUltimaConexion)}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),

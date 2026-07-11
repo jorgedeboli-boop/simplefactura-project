@@ -78,7 +78,10 @@ if ($resultado['filas_afectadas'] === 0) {
 $usuarios = db_consultar(
     $conexionTenant,
     "SELECT u.id, u.nombre, u.apellidos, u.email, u.telefono, u.estado,
-            u.ultimo_acceso, u.fecha_creacion, r.id AS role_id, r.nombre AS role_nombre
+            u.ultimo_acceso, u.fecha_creacion, r.id AS role_id, r.nombre AS role_nombre,
+            (SELECT MAX(c.dateConexion)
+             FROM usersConexions c
+             WHERE c.userId = u.id) AS ultima_conexion
      FROM usuarios u
      INNER JOIN roles r ON r.id = u.role_id
      WHERE u.id = ?

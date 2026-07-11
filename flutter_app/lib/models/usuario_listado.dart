@@ -6,6 +6,7 @@ class UsuarioListado {
   final String? telefono;
   final String estado;
   final DateTime? ultimoAcceso;
+  final DateTime? ultimaConexion;
   final DateTime fechaCreacion;
   final int roleId;
   final String roleNombre;
@@ -18,6 +19,7 @@ class UsuarioListado {
     this.telefono,
     required this.estado,
     this.ultimoAcceso,
+    this.ultimaConexion,
     required this.fechaCreacion,
     required this.roleId,
     required this.roleNombre,
@@ -32,6 +34,7 @@ class UsuarioListado {
       telefono: json['telefono'] as String?,
       estado: json['estado'] as String,
       ultimoAcceso: _fecha(json['ultimo_acceso']),
+      ultimaConexion: _fecha(json['ultima_conexion']),
       fechaCreacion: _fecha(json['fecha_creacion']) ?? DateTime.now(),
       roleId: _entero(json['role_id']),
       roleNombre: json['role_nombre'] as String,
@@ -42,6 +45,8 @@ class UsuarioListado {
       apellidos != null && apellidos!.isNotEmpty ? '$nombre $apellidos' : nombre;
 
   bool get activo => estado == 'activo';
+
+  DateTime? get fechaUltimaConexion => ultimaConexion ?? ultimoAcceso;
 
   static int _entero(dynamic valor) {
     if (valor is int) return valor;

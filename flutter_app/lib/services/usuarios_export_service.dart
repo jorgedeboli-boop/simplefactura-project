@@ -39,7 +39,7 @@ class UsuariosExportService {
             usuario.telefono ?? '',
             usuario.roleNombre,
             usuario.activo ? 'Activo' : 'Inactivo',
-            _formatearFecha(usuario.ultimoAcceso),
+            _formatearFecha(usuario.fechaUltimaConexion),
             _formatearFecha(usuario.fechaCreacion),
           ],
         )
