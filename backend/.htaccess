@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# Apache suele no pasar Authorization a PHP; esto lo reenvia.
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# /api/auth/login -> index.php?accion=auth_login
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-zA-Z0-9_]+)/([a-zA-Z0-9_]+)/?$ index.php?accion=$1_$2 [QSA,L]
+
+# /api/clientes -> index.php?accion=clientes_listar (GET) segun metodo, resuelto en PHP si se prefiere
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-zA-Z0-9_]+)/?$ index.php?accion=$1 [QSA,L]

@@ -1,0 +1,20 @@
+<?php
+// ============================================================================
+// Plantilla de configuracion. Copiar a constantes.php y ajustar en el servidor.
+// NO subir constantes.php de desarrollo a produccion por FTP.
+// ============================================================================
+
+define('SF_CONTROL_DB_HOST', '127.0.0.1');
+define('SF_CONTROL_DB_NAME', 'simplefactura_control');
+define('SF_CONTROL_DB_USER', 'simplefactura_app');
+define('SF_CONTROL_DB_PASS', 'TU_CLAVE_DE_BASE_DE_DATOS');
+
+define('SF_TOKEN_HORAS_EXPIRACION', 12);
+define('SF_RECUPERACION_HORAS_EXPIRACION', 24);
+
+define('SF_APP_URL', 'https://my.simplefactura.app');
+define('SF_CORREO_REMITENTE', 'noreply@simplefactura.app');
+
+date_default_timezone_set('UTC');
+
+define('SF_DEBUG', false);

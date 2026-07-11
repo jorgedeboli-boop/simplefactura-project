@@ -1,0 +1,18 @@
+# Secretos / config local del servidor
+backend/config/constantes.php
+**/api/config/constantes.php
+
+# Metadatos Dreamweaver / FTP local
+**/_notes/
+**/_notes/**
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+
+# Logs
+*.log
