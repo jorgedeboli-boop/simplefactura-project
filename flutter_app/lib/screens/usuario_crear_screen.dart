@@ -178,7 +178,6 @@ class _UsuarioCrearScreenState extends State<UsuarioCrearScreen> {
                   JerarquiaSelector(
                     roles: _roles,
                     valor: _roleId,
-                    label: 'Rol',
                     habilitado: !_guardando,
                     onChanged: (valor) => setState(() => _roleId = valor),
                   ),

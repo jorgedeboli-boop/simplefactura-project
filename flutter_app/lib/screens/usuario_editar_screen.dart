@@ -201,7 +201,6 @@ class _UsuarioEditarScreenState extends State<UsuarioEditarScreen> {
                   DropdownMenu<String>(
                     key: ValueKey('estado-$_estado'),
                     initialSelection: _estado,
-                    label: const Text('Estado'),
                     expandedInsets: EdgeInsets.zero,
                     dropdownMenuEntries: const [
                       DropdownMenuEntry(value: 'activo', label: 'Activo'),

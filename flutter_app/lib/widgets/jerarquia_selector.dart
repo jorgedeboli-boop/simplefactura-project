@@ -172,39 +172,11 @@ class JerarquiaSelector extends StatelessWidget {
     );
   }
 
-  Widget _campoConEtiquetaFlotante(Widget dropdown) {
-    final muestraEtiqueta = _opcionInicial != null;
-
-    if (!muestraEtiqueta) return dropdown;
-
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        dropdown,
-        Positioned(
-          left: 11,
-          top: -8,
-          child: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: AppTheme.colorTexto.withValues(alpha: 0.65),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final opciones = _opciones;
     final esPill = estilo == JerarquiaSelectorEstilo.pill;
-    final hint = esPill ? textoPlaceholder : label;
+    final hint = textoPlaceholder;
 
     final dropdown = DropdownFlutter<_OpcionJerarquia>(
       hintText: hint,
@@ -219,16 +191,11 @@ class JerarquiaSelector extends StatelessWidget {
       onChanged: (opcion) => onChanged(opcion?.id),
     );
 
-    var contenido = _sinDecoracionInput(context, dropdown);
-    if (!esPill) {
-      contenido = _campoConEtiquetaFlotante(contenido);
-    }
-
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxWidth: esPill ? anchoMaximo : double.infinity,
       ),
-      child: contenido,
+      child: _sinDecoracionInput(context, dropdown),
     );
   }
 }
