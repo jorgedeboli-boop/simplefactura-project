@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Plantilla de Factura</title>
+<style>
+  /* ============================================================
+     COLOR Y LOGO - cambiar aca
+     ============================================================ */
+  :root {
+    --color-primary: #2bb8c6;   /* <- color principal de toda la factura */
+    --color-dark: #58595b;      /* barra de items y pie de pagina */
+    --color-text: #6d6e70;      /* texto secundario */
+    --color-heading: #4a4a4a;   /* texto oscuro de titulos */
+    --color-row-a: #f3f3f3;     /* fila clara de la tabla (impar) */
+    --color-row-b: #eaf6f7;     /* fila con tinte del color (par) */
+    --logo-text: "HIGH-TECH";
+    --logo-subtext: "TECHNOLOGIE MACHINE";
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #e5e5e5;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--color-text);
+  }
+
+  .hoja {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 14mm 14mm 0 14mm;
+    position: relative;
+  }
+
+  /* ---------- Encabezado ---------- */
+  .encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 14px;
+  }
+
+  .marca {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Logo por defecto (icono + texto). Para poner tu propio logo,
+     reemplaza todo el contenido de .marca por:
+     <img src="tu-logo.png" style="height:48px;"> */
+  .logo-icono {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-icono svg { width: 24px; height: 24px; fill: #fff; }
+
+  .marca-texto .titulo {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-heading);
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+  }
+  .marca-texto .subtitulo {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-primary);
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
+
+  .datos-empresa {
+    text-align: right;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--color-text);
+    max-width: 320px;
+  }
+
+  .linea-color {
+    height: 3px;
+    background: var(--color-primary);
+    margin-bottom: 28px;
+  }
+
+  /* ---------- Bloque INVOICE TO / INVOICE ---------- */
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 34px;
+  }
+
+  .meta-izquierda h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-heading);
+    letter-spacing: 1px;
+    margin: 0 0 10px 0;
+  }
+  .meta-izquierda .cliente-nombre {
+    font-size: 13px;
+    color: var(--color-heading);
+    margin-bottom: 10px;
+  }
+  .meta-izquierda .dato-icono {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .icono-mini {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .icono-mini svg { width: 11px; height: 11px; fill: #fff; }
+
+  .meta-derecha { text-align: right; }
+  .meta-derecha h1 {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: 4px;
+    margin: 0 0 14px 0;
+  }
+  .meta-derecha .fila-dato {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .meta-derecha .fila-dato .etiqueta { color: var(--color-heading); font-weight: 600; }
+  .meta-derecha .fila-dato .valor { color: var(--color-text); min-width: 130px; text-align: left; }
+
+  /* ---------- Tabla de items ---------- */
+  table.items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 4px;
+  }
+  table.items thead th {
+    background: var(--color-dark);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+  }
+  table.items thead th.col-total {
+    background: var(--color-primary);
+    text-align: right;
+  }
+  table.items thead th.col-centro { text-align: center; }
+
+  table.items tbody td {
+    padding: 12px 14px;
+    font-size: 12px;
+    vertical-align: top;
+  }
+  table.items tbody tr:nth-child(odd) { background: var(--color-row-a); }
+  table.items tbody tr:nth-child(even) { background: var(--color-row-b); }
+
+  table.items .item-titulo {
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: 3px;
+  }
+  table.items .item-desc {
+    font-size: 10.5px;
+    color: var(--color-text);
+    line-height: 1.4;
+  }
+  table.items td.col-centro { text-align: center; }
+  table.items td.col-total { text-align: right; font-weight: 600; color: var(--color-heading); }
+
+  /* ---------- Notas + Totales ---------- */
+  .inferior {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 26px;
+  }
+
+  .notas { max-width: 330px; }
+  .nota-bloque {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .nota-bloque .icono-mini { margin-top: 2px; }
+  .nota-bloque h4 {
+    font-size: 12px;
+    color: var(--color-heading);
+    margin: 0 0 4px 0;
+  }
+  .nota-bloque p {
+    font-size: 10.5px;
+    line-height: 1.5;
+    margin: 0;
+    color: var(--color-text);
+  }
+
+  .totales { width: 280px; }
+  .totales .fila {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 6px 4px;
+  }
+  .totales .fila .etiqueta { color: var(--color-heading); }
+  .totales .total-final {
+    display: flex;
+    margin-top: 10px;
+  }
+  .totales .total-final .etiqueta {
+    flex: 1;
+    background: var(--color-dark);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+  .totales .total-final .valor {
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 10px 14px;
+    min-width: 100px;
+    text-align: right;
+  }
+
+  /* ---------- Firma ---------- */
+  .firma {
+    margin-top: 50px;
+    text-align: right;
+    padding-right: 20px;
+  }
+  .firma img { height: 55px; }
+  .firma .nombre { font-size: 13px; font-weight: 700; color: var(--color-heading); margin-top: 4px; }
+  .firma .cargo { font-size: 10.5px; color: var(--color-text); }
+
+  /* ---------- Pie de pagina ---------- */
+  .pie {
+    background: var(--color-dark);
+    color: #fff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 20px;
+    font-size: 11px;
+    margin-top: 40px;
+    position: relative;
+    left: -14mm;
+    width: calc(100% + 28mm);
+  }
+  .pie .item-pie { display: flex; align-items: center; gap: 8px; }
+  .pie .icono-mini { background: var(--color-primary); }
+
+  @media print {
+    body { background: #fff; }
+    .hoja { margin: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="hoja">
+
+  <!-- ENCABEZADO: logo + datos de la empresa -->
+  <div class="encabezado">
+    <div class="marca">
+      <div class="logo-icono">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 6h-2.9a15.6 15.6 0 00-1.3-4.2A8 8 0 0118.9 8zM12 4c.8 1.1 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.9 1.9-4zM4.3 14a8 8 0 010-4h3.3a16.7 16.7 0 000 4H4.3zm.8 2h2.9c.3 1.5.7 2.9 1.3 4.2A8 8 0 015.1 16zm2.9-8H5.1a8 8 0 013.9-4.2A15.6 15.6 0 007.9 8zM12 20c-.8-1.1-1.5-2.5-1.9-4h3.8c-.4 1.5-1.1 2.9-1.9 4zm2.1-6H9.9a14.7 14.7 0 010-4h4.2a14.7 14.7 0 010 4zm.2 5.8c.6-1.3 1-2.7 1.3-4.2h2.9a8 8 0 01-4.2 4.2zM15.8 14a16.7 16.7 0 000-4h3.3a8 8 0 010 4z"/></svg>
+      </div>
+      <div class="marca-texto">
+        <div class="titulo">HIGH-TECH</div>
+        <div class="subtitulo">TECHNOLOGIE MACHINE</div>
+      </div>
+    </div>
+    <div class="datos-empresa">
+      Agnisqu, Obistium iniat 34, 7895 Ficienihit<br>
+      Phone: 97 567 87 87 55&nbsp;&nbsp; Fax: 97 567 87 87 57<br>
+      E-mail: office@yourbusiness.com
+    </div>
+  </div>
+  <div class="linea-color"></div>
+
+  <!-- INVOICE TO / INVOICE -->
+  <div class="meta">
+    <div class="meta-izquierda">
+      <h3>INVOICE TO</h3>
+      <div class="cliente-nombre">Agnisqu, Obistium iniat 34, 7895 Ficienihit</div>
+      <div class="dato-icono">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.7 5 6.5 6.5l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1l-2.1 2.3z"/></svg></span>
+        97 567 87 87 55
+      </div>
+      <div class="dato-icono">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></span>
+        office@yourbusiness.com
+      </div>
+    </div>
+    <div class="meta-derecha">
+      <h1>INVOICE</h1>
+      <div class="fila-dato">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span>
+        <span class="etiqueta">Invoice No:</span>
+        <span class="valor">000459</span>
+      </div>
+      <div class="fila-dato">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V10h14v10z"/></svg></span>
+        <span class="etiqueta">Invoice Date:</span>
+        <span class="valor">25th December 2026</span>
+      </div>
+      <div class="fila-dato">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.3-.6-3-1.2-3-2.1 0-1 1-1.7 2.6-1.7 1.4 0 2.2.6 2.5 1.7l1.9-.5c-.4-1.4-1.5-2.5-3.3-2.9V3.5h-2.2v1.9c-1.9.4-3.2 1.6-3.2 3.4 0 2.2 1.8 3.2 4.4 3.9 2.2.6 2.7 1.3 2.7 2.2 0 .7-.5 1.8-2.6 1.8-1.9 0-2.7-.8-2.9-1.9l-2 .5c.3 1.7 1.6 2.7 3.4 3.1v1.9h2.2v-1.8c2-.4 3.4-1.6 3.4-3.5 0-2.6-2.3-3.5-4.9-4.1z"/></svg></span>
+        <span class="etiqueta">Total Due:</span>
+        <span class="valor">$ 1,500.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA DE ITEMS -->
+  <table class="items">
+    <thead>
+      <tr>
+        <th style="width:46%;">Item Description</th>
+        <th class="col-centro" style="width:16%;">Quantity</th>
+        <th style="width:19%;">Unit Price</th>
+        <th class="col-total" style="width:19%;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="item-titulo">Item Description</div>
+          <div class="item-desc">Acipsani endelite doluptione non plant faceriaecus ulparum atis natur, voluptur, cor sunt quia di aut.</div>
+        </td>
+        <td class="col-centro">2</td>
+        <td>$ 750.00</td>
+        <td class="col-total">$ 1,500.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-titulo">Item Description</div>
+          <div class="item-desc">Acipsani endelite doluptione non plant faceriaecus ulparum atis natur, voluptur, cor sunt quia di aut.</div>
+        </td>
+        <td class="col-centro">1</td>
+        <td>$ 300.00</td>
+        <td class="col-total">$ 300.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-titulo">Item Description</div>
+          <div class="item-desc">Acipsani endelite doluptione non plant faceriaecus ulparum atis natur, voluptur, cor sunt quia di aut.</div>
+        </td>
+        <td class="col-centro">3</td>
+        <td>$ 299.00</td>
+        <td class="col-total">$ 897.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-titulo">Item Description</div>
+          <div class="item-desc">Acipsani endelite doluptione non plant faceriaecus ulparum atis natur, voluptur, cor sunt quia di aut.</div>
+        </td>
+        <td class="col-centro">1</td>
+        <td>$ 780.00</td>
+        <td class="col-total">$ 780.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- NOTAS + TOTALES -->
+  <div class="inferior">
+    <div class="notas">
+      <div class="nota-bloque">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></span>
+        <div><h4 style="display:inline;">Terms: 30 days from issue</h4></div>
+      </div>
+      <div class="nota-bloque">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4H4V6h16v2z"/></svg></span>
+        <div>
+          <h4>Payment Information</h4>
+          <p>Sime omnimag natibus es nis eum re prupuditest, tem que numqui doluptas sinvel mod eos rem fuga. Ribus es aliqui il maiori sit unti sit et lam quam volum.</p>
+        </div>
+      </div>
+      <div class="nota-bloque">
+        <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span>
+        <div>
+          <h4>Terms &amp; Conditions</h4>
+          <p>Sime omnimag natibus es nis eum re prupuditest, tem que numqui doluptas sinvel mod eos rem fuga. Ribus es aliqui il maiori sit unti sit et lam quam volum.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="totales">
+      <div class="fila"><span class="etiqueta">Subtotal</span><span>$ 3,477.00</span></div>
+      <div class="fila"><span class="etiqueta">Tax VAT 7%</span><span>$ 243.39</span></div>
+      <div class="fila"><span class="etiqueta">Discount 0%</span><span></span></div>
+      <div class="total-final">
+        <div class="etiqueta">Total Due:</div>
+        <div class="valor">$ 1,500.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIRMA -->
+  <div class="firma">
+    <svg width="140" height="55" viewBox="0 0 140 55"><path d="M5 40 C 20 10, 35 45, 50 20 S 80 5, 95 30 S 120 45, 135 15" stroke="#3a3a3a" stroke-width="2" fill="none"/></svg>
+    <div class="nombre">John Doe</div>
+    <div class="cargo">Project Director</div>
+  </div>
+
+  <!-- PIE DE PAGINA -->
+  <div class="pie">
+    <div class="item-pie">
+      <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></span>
+      stevenson@yourcompany.com
+    </div>
+    <div class="item-pie">
+      <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.7 5 6.5 6.5l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1l-2.1 2.3z"/></svg></span>
+      +75 754 234 908
+    </div>
+    <div class="item-pie">
+      <span class="icono-mini"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 6h-2.9a15.6 15.6 0 00-1.3-4.2A8 8 0 0118.9 8zM12 4c.8 1.1 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.9 1.9-4zM4.3 14a8 8 0 010-4h3.3a16.7 16.7 0 000 4H4.3zm.8 2h2.9c.3 1.5.7 2.9 1.3 4.2A8 8 0 015.1 16zm2.9-8H5.1a8 8 0 013.9-4.2A15.6 15.6 0 007.9 8zM12 20c-.8-1.1-1.5-2.5-1.9-4h3.8c-.4 1.5-1.1 2.9-1.9 4zm2.1-6H9.9a14.7 14.7 0 010-4h4.2a14.7 14.7 0 010 4zm.2 5.8c.6-1.3 1-2.7 1.3-4.2h2.9a8 8 0 01-4.2 4.2zM15.8 14a16.7 16.7 0 000-4h3.3a8 8 0 010 4z"/></svg></span>
+      www.yourcompany.com
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -59,7 +59,7 @@ function sf_renderizar_plantilla_factura($numeroDiseno, $colorHex, $logoUrl = nu
 
     $ruta = __DIR__ . '/../plantillas_factura/diseno_' . $numeroDiseno . '.html';
     if (!is_readable($ruta)) {
-        responder_error('Plantilla de factura no encontrada', 404);
+        throw new RuntimeException('Plantilla de factura no encontrada: diseno_' . $numeroDiseno);
     }
 
     $html = file_get_contents($ruta);

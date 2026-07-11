@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 Widget construirVistaPreviaFactura({
-  required String url,
+  required String html,
   required double height,
 }) {
   return Container(

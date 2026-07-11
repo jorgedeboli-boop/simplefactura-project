@@ -4,19 +4,19 @@ import 'dart:ui_web' as ui_web;
 import 'package:flutter/material.dart';
 
 Widget construirVistaPreviaFactura({
-  required String url,
+  required String html,
   required double height,
 }) {
-  return _FacturaPreviewIframe(url: url, height: height);
+  return _FacturaPreviewIframe(html: html, height: height);
 }
 
 class _FacturaPreviewIframe extends StatefulWidget {
   const _FacturaPreviewIframe({
-    required this.url,
+    required this.html,
     required this.height,
   });
 
-  final String url;
+  final String html;
   final double height;
 
   @override
@@ -29,15 +29,34 @@ class _FacturaPreviewIframeState extends State<_FacturaPreviewIframe> {
   @override
   void initState() {
     super.initState();
-    _viewType = 'factura-preview-${widget.url.hashCode}-${identityHashCode(this)}';
+    _viewType =
+        'factura-preview-${widget.html.hashCode}-${identityHashCode(this)}';
     ui_web.platformViewRegistry.registerViewFactory(_viewType, (int _) {
       final iframe = html.IFrameElement()
-        ..src = widget.url
+        ..srcdoc = widget.html
         ..style.border = 'none'
         ..style.width = '100%'
         ..style.height = '100%';
       return iframe;
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant _FacturaPreviewIframe oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.html != widget.html) {
+      // Recrear el iframe cuando cambia color/diseno/logo.
+      _viewType =
+          'factura-preview-${widget.html.hashCode}-${identityHashCode(this)}';
+      ui_web.platformViewRegistry.registerViewFactory(_viewType, (int _) {
+        final iframe = html.IFrameElement()
+          ..srcdoc = widget.html
+          ..style.border = 'none'
+          ..style.width = '100%'
+          ..style.height = '100%';
+        return iframe;
+      });
+    }
   }
 
   @override
@@ -47,7 +66,10 @@ class _FacturaPreviewIframeState extends State<_FacturaPreviewIframe> {
       child: SizedBox(
         height: widget.height,
         width: double.infinity,
-        child: HtmlElementView(viewType: _viewType),
+        child: HtmlElementView(
+          key: ValueKey(_viewType),
+          viewType: _viewType,
+        ),
       ),
     );
   }

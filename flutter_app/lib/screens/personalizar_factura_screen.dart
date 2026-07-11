@@ -6,6 +6,7 @@ import '../models/empresa_configuracion.dart';
 import '../services/api_service.dart';
 import '../services/empresa_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/factura_plantilla_local.dart';
 import '../utils/factura_preview.dart';
 import '../widgets/app_action_button.dart';
 
@@ -197,12 +198,6 @@ class _PersonalizarFacturaScreenState extends State<PersonalizarFacturaScreen>
     return Color(int.parse(valor, radix: 16));
   }
 
-  String _urlPrevia(int diseno) {
-    return _servicio!
-        .urlVistaPreviaFactura(diseno: diseno, color: _colorDesign)
-        .toString();
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_cargando) {
@@ -386,7 +381,8 @@ class _PersonalizarFacturaScreenState extends State<PersonalizarFacturaScreen>
             titulo: diseno.$2,
             subtitulo: diseno.$3,
             seleccionado: _disenoSeleccionado == diseno.$1,
-            previewUrl: _urlPrevia(diseno.$1),
+            color: _colorDesign,
+            logoUrl: _logotipoUrl,
             onTap: () => setState(() => _disenoSeleccionado = diseno.$1),
           ),
           const SizedBox(height: 16),
@@ -518,7 +514,8 @@ class _TarjetaDiseno extends StatelessWidget {
     required this.titulo,
     required this.subtitulo,
     required this.seleccionado,
-    required this.previewUrl,
+    required this.color,
+    required this.logoUrl,
     required this.onTap,
   });
 
@@ -526,7 +523,8 @@ class _TarjetaDiseno extends StatelessWidget {
   final String titulo;
   final String subtitulo;
   final bool seleccionado;
-  final String previewUrl;
+  final String color;
+  final String? logoUrl;
   final VoidCallback onTap;
 
   @override
@@ -586,14 +584,92 @@ class _TarjetaDiseno extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              construirVistaPreviaFactura(
-                url: previewUrl,
-                height: 220,
+              _VistaPreviaDiseno(
+                key: ValueKey('$numero|$color|${logoUrl ?? ''}'),
+                diseno: numero,
+                color: color,
+                logoUrl: logoUrl,
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _VistaPreviaDiseno extends StatefulWidget {
+  const _VistaPreviaDiseno({
+    super.key,
+    required this.diseno,
+    required this.color,
+    this.logoUrl,
+  });
+
+  final int diseno;
+  final String color;
+  final String? logoUrl;
+
+  @override
+  State<_VistaPreviaDiseno> createState() => _VistaPreviaDisenoState();
+}
+
+class _VistaPreviaDisenoState extends State<_VistaPreviaDiseno> {
+  late Future<String> _htmlFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _htmlFuture = _renderizar();
+  }
+
+  @override
+  void didUpdateWidget(covariant _VistaPreviaDiseno oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.diseno != widget.diseno ||
+        oldWidget.color != widget.color ||
+        oldWidget.logoUrl != widget.logoUrl) {
+      setState(() => _htmlFuture = _renderizar());
+    }
+  }
+
+  Future<String> _renderizar() {
+    return FacturaPlantillaLocal.renderizar(
+      diseno: widget.diseno,
+      color: widget.color,
+      logoUrl: widget.logoUrl,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String>(
+      future: _htmlFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SizedBox(
+            height: 220,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          return SizedBox(
+            height: 220,
+            child: Center(
+              child: Text(
+                'No se pudo cargar la vista previa',
+                style: TextStyle(
+                  color: AppTheme.colorTexto.withValues(alpha: 0.65),
+                ),
+              ),
+            ),
+          );
+        }
+        return construirVistaPreviaFactura(
+          html: snapshot.data!,
+          height: 220,
+        );
+      },
     );
   }
 }

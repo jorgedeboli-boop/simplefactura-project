@@ -17,27 +17,43 @@ $identificadorTenant = $sesion['tenant']['identificador'];
 auth_requerir_permiso($conexionTenant, $sesion['usuario_id'], 'empresa.ver');
 
 $diseno = isset($_GET['diseno']) ? (int) $_GET['diseno'] : 1;
-$color = isset($_GET['color']) ? (string) $_GET['color'] : '#398bf7';
+$color = isset($_GET['color']) ? urldecode((string) $_GET['color']) : '#398bf7';
 
+// SELECT * tolera tenants sin migracion de columnas nuevas.
 $filas = db_consultar(
     $conexionTenant,
-    'SELECT logotipo_file, color_design, factura_design FROM empresa_configuracion LIMIT 1'
+    'SELECT * FROM empresa_configuracion LIMIT 1'
 );
 
 $logoUrl = null;
-if (count($filas) > 0 && !empty($filas[0]['logotipo_file'])) {
-    $logoUrl = sf_url_upload_tenant($identificadorTenant, $filas[0]['logotipo_file']);
+if (count($filas) > 0) {
+    $fila = $filas[0];
+    if (!empty($fila['logotipo_file'])) {
+        $logoUrl = sf_url_upload_tenant($identificadorTenant, $fila['logotipo_file']);
+    }
+
+    if (!isset($_GET['color']) && !empty($fila['color_design'])) {
+        $color = $fila['color_design'];
+    }
+
+    if (!isset($_GET['diseno']) && !empty($fila['factura_design'])) {
+        $diseno = (int) $fila['factura_design'];
+    }
 }
 
-if (!isset($_GET['color']) && count($filas) > 0 && !empty($filas[0]['color_design'])) {
-    $color = $filas[0]['color_design'];
+try {
+    $html = sf_renderizar_plantilla_factura($diseno, $color, $logoUrl);
+} catch (Throwable $e) {
+    $detalle = defined('SF_DEBUG') && SF_DEBUG ? $e->getMessage() : '';
+    http_response_code(500);
+    header('Content-Type: text/html; charset=UTF-8');
+    echo '<!DOCTYPE html><html><body style="font-family:sans-serif;padding:24px;">'
+        . '<h3>No se pudo generar la vista previa</h3>'
+        . '<p>Comprueba que las plantillas esten desplegadas en el servidor.</p>'
+        . ($detalle !== '' ? '<pre>' . htmlspecialchars($detalle) . '</pre>' : '')
+        . '</body></html>';
+    exit;
 }
-
-if (!isset($_GET['diseno']) && count($filas) > 0 && !empty($filas[0]['factura_design'])) {
-    $diseno = (int) $filas[0]['factura_design'];
-}
-
-$html = sf_renderizar_plantilla_factura($diseno, $color, $logoUrl);
 
 header('Content-Type: text/html; charset=UTF-8');
 echo $html;
