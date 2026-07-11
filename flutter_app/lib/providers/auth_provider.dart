@@ -33,6 +33,7 @@ class AuthProvider extends ChangeNotifier {
     _api.establecerToken(token);
 
     final nombreUsuario = prefs.getString('sf_usuario_nombre');
+    final apellidosUsuario = prefs.getString('sf_usuario_apellidos');
     final emailUsuario = prefs.getString('sf_usuario_email');
     final idUsuario = prefs.getInt('sf_usuario_id');
     final roleId = prefs.getInt('sf_usuario_role_id');
@@ -40,7 +41,13 @@ class AuthProvider extends ChangeNotifier {
     final nombreEmpresa = prefs.getString('sf_empresa_nombre');
 
     if (idUsuario != null && emailUsuario != null && nombreUsuario != null && roleId != null) {
-      _usuario = Usuario(id: idUsuario, nombre: nombreUsuario, email: emailUsuario, roleId: roleId);
+      _usuario = Usuario(
+        id: idUsuario,
+        nombre: nombreUsuario,
+        apellidos: apellidosUsuario,
+        email: emailUsuario,
+        roleId: roleId,
+      );
     }
     if (identificadorEmpresa != null && nombreEmpresa != null) {
       _empresa = Empresa(identificador: identificadorEmpresa, nombreEmpresa: nombreEmpresa);
@@ -72,6 +79,11 @@ class AuthProvider extends ChangeNotifier {
       await prefs.setString('sf_token', _token!);
       await prefs.setInt('sf_usuario_id', _usuario!.id);
       await prefs.setString('sf_usuario_nombre', _usuario!.nombre);
+      if (_usuario!.apellidos != null && _usuario!.apellidos!.isNotEmpty) {
+        await prefs.setString('sf_usuario_apellidos', _usuario!.apellidos!);
+      } else {
+        await prefs.remove('sf_usuario_apellidos');
+      }
       await prefs.setString('sf_usuario_email', _usuario!.email);
       await prefs.setInt('sf_usuario_role_id', _usuario!.roleId);
       await prefs.setString('sf_empresa_identificador', _empresa!.identificador);
@@ -109,11 +121,58 @@ class AuthProvider extends ChangeNotifier {
     await prefs.remove('sf_token');
     await prefs.remove('sf_usuario_id');
     await prefs.remove('sf_usuario_nombre');
+    await prefs.remove('sf_usuario_apellidos');
     await prefs.remove('sf_usuario_email');
     await prefs.remove('sf_usuario_role_id');
     await prefs.remove('sf_empresa_identificador');
     await prefs.remove('sf_empresa_nombre');
 
+    notifyListeners();
+  }
+
+  /// Actualiza el nombre visible de la empresa en el menú (p. ej. tras editar datos).
+  Future<void> actualizarNombreEmpresaEnMenu(String nombreEmpresa) async {
+    if (_empresa == null || nombreEmpresa.trim().isEmpty) return;
+
+    _empresa = Empresa(
+      identificador: _empresa!.identificador,
+      nombreEmpresa: nombreEmpresa.trim(),
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('sf_empresa_nombre', _empresa!.nombreEmpresa);
+    notifyListeners();
+  }
+
+  /// Actualiza el usuario conectado en el menú (p. ej. si edita su propio perfil).
+  Future<void> actualizarUsuarioEnMenu({
+    required String nombre,
+    String? apellidos,
+    String? email,
+  }) async {
+    if (_usuario == null) return;
+
+    final apellidosLimpios = apellidos?.trim();
+    _usuario = Usuario(
+      id: _usuario!.id,
+      nombre: nombre.trim(),
+      apellidos: apellidosLimpios != null && apellidosLimpios.isNotEmpty
+          ? apellidosLimpios
+          : null,
+      email: email?.trim() ?? _usuario!.email,
+      roleId: _usuario!.roleId,
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('sf_usuario_nombre', _usuario!.nombre);
+    if (_usuario!.apellidos != null) {
+      await prefs.setString('sf_usuario_apellidos', _usuario!.apellidos!);
+    } else {
+      await prefs.remove('sf_usuario_apellidos');
+    }
+    if (email != null) {
+      await prefs.setString('sf_usuario_email', _usuario!.email);
+    }
     notifyListeners();
   }
 

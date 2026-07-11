@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../models/usuario_conexion.dart';
 import '../models/usuario_listado.dart';
+import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../services/usuarios_service.dart';
 import '../theme/app_theme.dart';
@@ -58,6 +60,17 @@ class _UsuarioFichaScreenState extends State<UsuarioFichaScreen>
       _usuario = actualizado;
       _modificado = true;
     });
+
+    final auth = context.read<AuthProvider>();
+    if (auth.usuario?.id == actualizado.id) {
+      await auth.actualizarUsuarioEnMenu(
+        nombre: actualizado.nombre,
+        apellidos: actualizado.apellidos,
+        email: actualizado.email,
+      );
+    }
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Usuario actualizado correctamente')),

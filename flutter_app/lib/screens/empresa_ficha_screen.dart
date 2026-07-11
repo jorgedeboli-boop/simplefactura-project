@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../services/empresa_service.dart';
 import '../models/empresa_configuracion.dart';
@@ -74,6 +75,14 @@ class _EmpresaFichaScreenState extends State<EmpresaFichaScreen> {
     if (!mounted || actualizado != true) return;
 
     await _cargar();
+    if (!mounted) return;
+
+    if (_empresa != null) {
+      await context.read<AuthProvider>().actualizarNombreEmpresaEnMenu(
+            _empresa!.tituloFicha,
+          );
+    }
+
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
