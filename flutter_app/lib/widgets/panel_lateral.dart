@@ -10,39 +10,37 @@ Future<T?> abrirPanelLateral<T>(
   required Widget child,
   double anchoMaximo = kAnchoPanelLateral,
 }) {
-  return Navigator.of(context).push<T>(
-    PageRouteBuilder<T>(
-      opaque: false,
-      barrierColor: Colors.black.withValues(alpha: 0.35),
-      barrierDismissible: true,
-      transitionDuration: const Duration(milliseconds: 280),
-      reverseTransitionDuration: const Duration(milliseconds: 220),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        final anchoPanel = math.min(anchoMaximo, MediaQuery.sizeOf(context).width);
+  return showGeneralDialog<T>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Cerrar panel',
+    barrierColor: Colors.black.withValues(alpha: 0.35),
+    transitionDuration: const Duration(milliseconds: 280),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      final anchoPanel = math.min(anchoMaximo, MediaQuery.sizeOf(context).width);
 
-        return Align(
-          alignment: Alignment.centerRight,
-          child: Material(
-            elevation: 12,
-            shadowColor: Colors.black26,
-            color: Colors.white,
-            child: SizedBox(
-              width: anchoPanel,
-              height: MediaQuery.sizeOf(context).height,
-              child: child,
-            ),
+      return Align(
+        alignment: Alignment.centerRight,
+        child: Material(
+          elevation: 12,
+          shadowColor: Colors.black26,
+          color: Colors.white,
+          child: SizedBox(
+            width: anchoPanel,
+            height: MediaQuery.sizeOf(context).height,
+            child: child,
           ),
-        );
-      },
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(1, 0),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
-          child: child,
-        );
-      },
-    ),
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, panel) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+        child: panel,
+      );
+    },
   );
 }

@@ -2,6 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Flutter iOS (simulador)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}/flutter_app",
+      "args": [
+        "--dart-define=API_BASE_URL=http://localhost:8080/index.php"
+      ],
+      "preLaunchTask": "📱 Abrir simulador iOS"
+    },
+    {
       "name": "Flutter web (API local)",
       "request": "launch",
       "type": "dart",
@@ -25,6 +36,5 @@
         "chrome"
       ]
     }
-  ],
-  "compounds": []
+  ]
 }

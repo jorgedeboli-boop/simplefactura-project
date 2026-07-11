@@ -2,6 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "📱 Abrir simulador iOS",
+      "type": "shell",
+      "command": "open -a Simulator || flutter emulators --launch apple_ios_simulator",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
+    },
+    {
       "label": "🐘 API PHP local",
       "type": "shell",
       "command": "bash",
