@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
-/// Botón de acción principal: texto 15px e icono representativo a la derecha.
+/// Botón de acción principal: texto 16px e icono representativo a la derecha.
 class AppActionButton extends StatelessWidget {
   const AppActionButton({
     super.key,
@@ -23,7 +23,7 @@ class AppActionButton extends StatelessWidget {
 
   static const TextStyle estiloTexto = TextStyle(
     fontWeight: FontWeight.w600,
-    fontSize: 15,
+    fontSize: 16,
   );
 
   @override

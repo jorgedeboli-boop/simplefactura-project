@@ -199,19 +199,28 @@ class _UsuarioEditarScreenState extends State<UsuarioEditarScreen> {
                     onChanged: (valor) => setState(() => _roleId = valor),
                   ),
                   const SizedBox(height: 16),
-                  DropdownMenu<String>(
-                    key: ValueKey('estado-$_estado'),
-                    initialSelection: _estado,
-                    expandedInsets: EdgeInsets.zero,
-                    dropdownMenuEntries: const [
-                      DropdownMenuEntry(value: 'activo', label: 'Activo'),
-                      DropdownMenuEntry(value: 'inactivo', label: 'Inactivo'),
-                    ],
-                    onSelected: _guardando
-                        ? null
-                        : (valor) {
-                            if (valor != null) setState(() => _estado = valor);
-                          },
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      textTheme: Theme.of(context).textTheme.copyWith(
+                        bodyLarge: AppTheme.textoDropdown,
+                        bodyMedium: AppTheme.textoDropdown,
+                      ),
+                    ),
+                    child: DropdownMenu<String>(
+                      key: ValueKey('estado-$_estado'),
+                      initialSelection: _estado,
+                      expandedInsets: EdgeInsets.zero,
+                      textStyle: AppTheme.textoDropdown,
+                      dropdownMenuEntries: const [
+                        DropdownMenuEntry(value: 'activo', label: 'Activo'),
+                        DropdownMenuEntry(value: 'inactivo', label: 'Inactivo'),
+                      ],
+                      onSelected: _guardando
+                          ? null
+                          : (valor) {
+                              if (valor != null) setState(() => _estado = valor);
+                            },
+                    ),
                   ),
                   const SizedBox(height: 16),
                   TextFormField(

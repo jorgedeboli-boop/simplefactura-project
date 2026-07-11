@@ -54,6 +54,11 @@ class JerarquiaSelector extends StatelessWidget {
 
   static const _bordeCampo = Color(0xFFDDE3EA);
 
+  static const _textoLista = TextStyle(
+    color: AppTheme.colorTexto,
+    fontSize: 16,
+  );
+
   List<_OpcionJerarquia> get _opciones {
     final opciones = <_OpcionJerarquia>[];
     if (mostrarOpcionTodos) {
@@ -90,18 +95,15 @@ class JerarquiaSelector extends StatelessWidget {
       expandedBorderRadius: const BorderRadius.all(Radius.circular(12)),
       headerStyle: const TextStyle(
         color: Colors.white,
-        fontSize: 14.4,
+        fontSize: 16,
         fontWeight: FontWeight.w500,
       ),
       hintStyle: TextStyle(
         color: Colors.white.withValues(alpha: 0.85),
-        fontSize: 14.4,
+        fontSize: 16,
         fontWeight: FontWeight.w500,
       ),
-      listItemStyle: const TextStyle(
-        color: AppTheme.colorTexto,
-        fontSize: 14,
-      ),
+      listItemStyle: _textoLista,
       closedSuffixIcon: iconoFlecha,
       expandedSuffixIcon: Icon(
         Icons.keyboard_arrow_up,
@@ -123,16 +125,11 @@ class JerarquiaSelector extends StatelessWidget {
       expandedBorderRadius: BorderRadius.circular(10),
       closedBorder: Border.all(color: _bordeCampo),
       expandedBorder: Border.all(color: AppTheme.colorPrimario, width: 1.5),
-      headerStyle: ThemeData.light().textTheme.bodyLarge?.copyWith(
-            color: AppTheme.colorTexto,
-          ),
-      hintStyle: ThemeData.light().textTheme.bodyLarge?.copyWith(
-            color: AppTheme.colorTexto.withValues(alpha: 0.45),
-          ),
-      listItemStyle: const TextStyle(
-        color: AppTheme.colorTexto,
-        fontSize: 14,
+      headerStyle: AppTheme.textoDropdown,
+      hintStyle: AppTheme.textoDropdown.copyWith(
+        color: AppTheme.colorTexto.withValues(alpha: 0.45),
       ),
+      listItemStyle: _textoLista,
       closedSuffixIcon: Icon(
         Icons.keyboard_arrow_down,
         color: AppTheme.colorTexto.withValues(alpha: 0.45),
@@ -176,10 +173,9 @@ class JerarquiaSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final opciones = _opciones;
     final esPill = estilo == JerarquiaSelectorEstilo.pill;
-    final hint = textoPlaceholder;
 
     final dropdown = DropdownFlutter<_OpcionJerarquia>(
-      hintText: hint,
+      hintText: textoPlaceholder,
       items: opciones,
       initialItem: _opcionInicial,
       enabled: habilitado && opciones.isNotEmpty,

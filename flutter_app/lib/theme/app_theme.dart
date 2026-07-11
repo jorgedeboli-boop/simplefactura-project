@@ -21,7 +21,13 @@ class AppTheme {
   static const TextStyle textoBotonAccion = TextStyle(
     fontFamily: 'Roboto',
     fontWeight: FontWeight.w600,
-    fontSize: 15,
+    fontSize: 16,
+  );
+
+  static const TextStyle textoDropdown = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 16,
+    color: colorTexto,
   );
 
   static final TextStyle textoDrawerSecundario = TextStyle(
