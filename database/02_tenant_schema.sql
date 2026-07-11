@@ -49,6 +49,7 @@ CREATE TABLE empresa_configuracion (
     razon_social            VARCHAR(255) NOT NULL,
     nombre_comercial        VARCHAR(255) NULL,
     identificacion_fiscal   VARCHAR(64) NOT NULL COMMENT 'NIF/RFC/RUC/RUT/NIT segun pais',
+    tipo_empresa            ENUM('autonomo','sl','slu') NOT NULL DEFAULT 'sl',
     pais_id                 INT NOT NULL,
     direccion               VARCHAR(255) NULL,
     ciudad                  VARCHAR(100) NULL,

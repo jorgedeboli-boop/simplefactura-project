@@ -152,6 +152,10 @@ class _EmpresaFichaScreenState extends State<EmpresaFichaScreen> {
                 etiqueta: 'Identificación fiscal',
                 valor: empresa.identificacionFiscal,
               ),
+              _CampoDetalle(
+                etiqueta: 'Tipo de empresa',
+                valor: empresa.tipoEmpresa.etiqueta,
+              ),
               if (empresa.paisNombre != null)
                 _CampoDetalle(etiqueta: 'País', valor: empresa.paisNombre!),
               if (empresa.direccion?.isNotEmpty == true)

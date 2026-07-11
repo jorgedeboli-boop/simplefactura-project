@@ -17,12 +17,12 @@ USE sf_cliente_pruebas;
 
 -- Datos de la empresa (pais_id = 1 -> España, EUR). Cambiar segun el cliente real.
 INSERT INTO empresa_configuracion
-    (razon_social, nombre_comercial, identificacion_fiscal, pais_id,
+    (razon_social, nombre_comercial, identificacion_fiscal, tipo_empresa, pais_id,
      direccion, ciudad, provincia_estado, codigo_postal,
      telefono_principal, email_corporativo, email_facturacion, sitio_web,
      moneda_codigo, regimen_iva_id, logotipo_url, color_primario)
 VALUES
-    ('Empresa de Pruebas S.L.', 'Simple Factura Demo', 'B00000000', 1,
+    ('Empresa de Pruebas S.L.', 'Simple Factura Demo', 'B00000000', 'sl', 1,
      'Calle Ejemplo 123', 'Madrid', 'Madrid', '28001',
      '+34 900 000 000', 'contacto@empresapruebas.test', 'facturacion@empresapruebas.test',
      'https://empresapruebas.test',

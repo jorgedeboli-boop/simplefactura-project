@@ -18,12 +18,14 @@ $entrada = leer_json_entrada();
 
 // Campos editables (whitelist explicita para evitar actualizar columnas no permitidas)
 $camposPermitidos = array(
-    'razon_social', 'nombre_comercial', 'identificacion_fiscal', 'pais_id',
+    'razon_social', 'nombre_comercial', 'identificacion_fiscal', 'tipo_empresa', 'pais_id',
     'direccion', 'ciudad', 'provincia_estado', 'codigo_postal',
     'telefono_principal', 'telefono_secundario', 'email_corporativo',
     'email_facturacion', 'sitio_web', 'moneda_codigo', 'regimen_iva_id',
     'logotipo_url', 'color_primario', 'iban_cuenta',
 );
+
+$tiposValidosEmpresa = array('autonomo', 'sl', 'slu');
 
 $sets = array();
 $tipos = '';
@@ -31,6 +33,16 @@ $valores = array();
 
 foreach ($camposPermitidos as $campo) {
     if (array_key_exists($campo, $entrada)) {
+        if ($campo === 'tipo_empresa') {
+            $tipo = limpiar_texto($entrada[$campo]);
+            if (!in_array($tipo, $tiposValidosEmpresa, true)) {
+                responder_error('Tipo de empresa no valido', 400);
+            }
+            $sets[] = "$campo = ?";
+            $tipos .= 's';
+            $valores[] = $tipo;
+            continue;
+        }
         $sets[] = "$campo = ?";
         $tipos .= 's';
         $valores[] = limpiar_texto($entrada[$campo]);

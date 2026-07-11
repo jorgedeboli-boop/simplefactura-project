@@ -1,7 +1,10 @@
+import 'tipo_empresa.dart';
+
 class EmpresaConfiguracion {
   final String razonSocial;
   final String? nombreComercial;
   final String identificacionFiscal;
+  final TipoEmpresa tipoEmpresa;
   final int paisId;
   final String? paisNombre;
   final String? direccion;
@@ -24,6 +27,7 @@ class EmpresaConfiguracion {
     required this.razonSocial,
     this.nombreComercial,
     required this.identificacionFiscal,
+    required this.tipoEmpresa,
     required this.paisId,
     this.paisNombre,
     this.direccion,
@@ -48,6 +52,7 @@ class EmpresaConfiguracion {
       razonSocial: json['razon_social'] as String,
       nombreComercial: json['nombre_comercial'] as String?,
       identificacionFiscal: json['identificacion_fiscal'] as String,
+      tipoEmpresa: TipoEmpresa.fromValor(json['tipo_empresa'] as String?),
       paisId: json['pais_id'] is int
           ? json['pais_id'] as int
           : int.parse(json['pais_id'].toString()),

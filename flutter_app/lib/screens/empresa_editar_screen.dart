@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../models/empresa_configuracion.dart';
+import '../models/tipo_empresa.dart';
 import '../services/api_service.dart';
 import '../services/empresa_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_action_button.dart';
+import '../widgets/selector_tipo_empresa.dart';
 
 class EmpresaEditarScreen extends StatefulWidget {
   const EmpresaEditarScreen({
@@ -36,6 +38,7 @@ class _EmpresaEditarScreenState extends State<EmpresaEditarScreen> {
   late final TextEditingController _monedaController;
   late final TextEditingController _ibanController;
 
+  late TipoEmpresa _tipoEmpresa;
   bool _guardando = false;
   String? _error;
 
@@ -60,6 +63,7 @@ class _EmpresaEditarScreenState extends State<EmpresaEditarScreen> {
     _sitioWebController = TextEditingController(text: e.sitioWeb ?? '');
     _monedaController = TextEditingController(text: e.monedaCodigo);
     _ibanController = TextEditingController(text: e.ibanCuenta ?? '');
+    _tipoEmpresa = e.tipoEmpresa;
   }
 
   @override
@@ -93,6 +97,7 @@ class _EmpresaEditarScreenState extends State<EmpresaEditarScreen> {
         'razon_social': _razonSocialController.text.trim(),
         'nombre_comercial': _nombreComercialController.text.trim(),
         'identificacion_fiscal': _identificacionController.text.trim(),
+        'tipo_empresa': _tipoEmpresa.valor,
         'direccion': _direccionController.text.trim(),
         'ciudad': _ciudadController.text.trim(),
         'provincia_estado': _provinciaController.text.trim(),
@@ -156,6 +161,12 @@ class _EmpresaEditarScreenState extends State<EmpresaEditarScreen> {
               textInputAction: TextInputAction.next,
               validator: (v) =>
                   (v == null || v.trim().isEmpty) ? 'Requerido' : null,
+            ),
+            const SizedBox(height: 16),
+            SelectorTipoEmpresa(
+              valor: _tipoEmpresa,
+              habilitado: !_guardando,
+              onChanged: (tipo) => setState(() => _tipoEmpresa = tipo),
             ),
             const SizedBox(height: 16),
             TextFormField(
