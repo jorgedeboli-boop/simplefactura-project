@@ -112,3 +112,24 @@ function sf_enriquecer_empresa_logotipo($fila, $identificadorTenant) {
     }
     return $fila;
 }
+
+/**
+ * Devuelve columnas de una tabla que NO existen en la BD del tenant.
+ */
+function sf_tenant_columnas_faltantes($conexion, $tabla, $columnas) {
+    $faltantes = array();
+    foreach ($columnas as $columna) {
+        $filas = db_consultar(
+            $conexion,
+            "SELECT 1 AS ok FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?
+             LIMIT 1",
+            'ss',
+            array($tabla, $columna)
+        );
+        if (count($filas) === 0) {
+            $faltantes[] = $columna;
+        }
+    }
+    return $faltantes;
+}

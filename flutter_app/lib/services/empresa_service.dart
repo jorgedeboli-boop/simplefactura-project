@@ -14,7 +14,8 @@ class EmpresaService {
   }
 
   Future<void> actualizar(Map<String, dynamic> campos) async {
-    await _api.put('empresa_actualizar', campos);
+    // POST: mas compatible que PUT en hostings compartidos (Apache/FTP).
+    await _api.post('empresa_actualizar', campos);
   }
 
   Future<Map<String, String>> subirLogotipo({

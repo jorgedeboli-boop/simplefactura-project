@@ -13,6 +13,31 @@ require_once __DIR__ . '/lib/auth.php';
 require_once __DIR__ . '/lib/validacion.php';
 require_once __DIR__ . '/lib/utilidades.php';
 require_once __DIR__ . '/lib/conexiones.php';
+
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error === null) {
+        return;
+    }
+    $tiposFatales = array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR);
+    if (!in_array($error['type'], $tiposFatales, true)) {
+        return;
+    }
+    if (headers_sent()) {
+        return;
+    }
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
+    $mensaje = 'Error interno del servidor';
+    if (defined('SF_DEBUG') && SF_DEBUG) {
+        $mensaje .= ': ' . $error['message'];
+    }
+    echo json_encode(array(
+        'ok'    => false,
+        'error' => $mensaje,
+    ), JSON_UNESCAPED_UNICODE);
+});
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Auth-Token');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');

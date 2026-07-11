@@ -28,5 +28,12 @@ cp "$ROOT/backend/config/constantes.php.example" "$API_DIR/config/"
 cp "$ROOT/backend/lib/"*.php "$API_DIR/lib/"
 cp "$ROOT/backend/endpoints/"*.php "$API_DIR/endpoints/"
 
+mkdir -p "$API_DIR/plantillas_factura" "$API_DIR/uploads"
+cp "$ROOT/backend/plantillas_factura/"*.html "$API_DIR/plantillas_factura/" 2>/dev/null || true
+if [ -f "$ROOT/backend/uploads/.htaccess" ]; then
+  cp "$ROOT/backend/uploads/.htaccess" "$API_DIR/uploads/"
+fi
+touch "$API_DIR/uploads/.gitkeep"
+
 echo "==> Build completada: $FLUTTER_DIR/build/web/"
 echo "    (api/config/constantes.php NO incluido — conservar el del servidor)"

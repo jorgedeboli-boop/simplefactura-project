@@ -1,6 +1,6 @@
 <?php
 // ============================================================================
-// PUT /api/empresa/actualizar
+// PUT/POST /api/empresa/actualizar
 // Cabecera: Authorization: Bearer <token>
 // Body: campos de empresa_configuracion a actualizar (parcial)
 // ============================================================================
@@ -16,6 +16,13 @@ auth_requerir_permiso($conexionTenant, $sesion['usuario_id'], 'empresa.editar');
 
 $entrada = leer_json_entrada();
 
+if (count($entrada) === 0) {
+    responder_error(
+        'No se recibieron datos. Si el hosting bloquea PUT, la app debe usar POST.',
+        400
+    );
+}
+
 // Campos editables (whitelist explicita para evitar actualizar columnas no permitidas)
 $camposPermitidos = array(
     'razon_social', 'nombre_comercial', 'identificacion_fiscal', 'tipo_empresa', 'pais_id',
@@ -25,6 +32,28 @@ $camposPermitidos = array(
     'logotipo_url', 'logotipo_file', 'color_primario', 'factura_design', 'color_design',
     'iban_cuenta',
 );
+
+$columnasPersonalizacion = array('logotipo_file', 'factura_design', 'color_design');
+$columnasSolicitadas = array();
+foreach ($columnasPersonalizacion as $columna) {
+    if (array_key_exists($columna, $entrada)) {
+        $columnasSolicitadas[] = $columna;
+    }
+}
+if (count($columnasSolicitadas) > 0) {
+    $faltantes = sf_tenant_columnas_faltantes(
+        $conexionTenant,
+        'empresa_configuracion',
+        $columnasSolicitadas
+    );
+    if (count($faltantes) > 0) {
+        responder_error(
+            'Faltan columnas en la BD del tenant: ' . implode(', ', $faltantes)
+            . '. Ejecute database/07_empresa_factura_personalizacion.sql',
+            503
+        );
+    }
+}
 
 $tiposValidosEmpresa = array('autonomo', 'sl', 'slu');
 
