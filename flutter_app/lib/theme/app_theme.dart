@@ -18,6 +18,12 @@ class AppTheme {
     color: Colors.white,
   );
 
+  static const TextStyle textoBotonAccion = TextStyle(
+    fontFamily: 'Roboto',
+    fontWeight: FontWeight.w600,
+    fontSize: 15,
+  );
+
   static final TextStyle textoDrawerSecundario = TextStyle(
     fontFamily: 'Roboto',
     fontWeight: FontWeight.w400,
@@ -49,7 +55,15 @@ class AppTheme {
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+          textStyle: textoBotonAccion,
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: colorNavBar,
+          foregroundColor: Colors.white,
+          textStyle: textoBotonAccion,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

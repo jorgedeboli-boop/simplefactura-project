@@ -10,6 +10,7 @@ import '../services/api_service.dart';
 import '../services/usuarios_export_service.dart';
 import '../services/usuarios_service.dart';
 import '../utils/file_download.dart';
+import '../widgets/app_action_button.dart';
 import '../widgets/jerarquia_selector.dart';
 import '../widgets/panel_lateral.dart';
 import '../theme/app_theme.dart';
@@ -195,10 +196,11 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 24),
-              FilledButton.icon(
+              AppActionButton(
+                label: 'Reintentar',
+                icon: Icons.refresh,
+                expandido: false,
                 onPressed: _cargar,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Reintentar'),
               ),
             ],
           ),

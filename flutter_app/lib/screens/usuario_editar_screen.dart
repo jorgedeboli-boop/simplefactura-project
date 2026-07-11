@@ -6,6 +6,7 @@ import '../models/usuario_listado.dart';
 import '../services/api_service.dart';
 import '../services/usuarios_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_action_button.dart';
 import '../widgets/jerarquia_selector.dart';
 
 class UsuarioEditarScreen extends StatefulWidget {
@@ -268,31 +269,11 @@ class _UsuarioEditarScreenState extends State<UsuarioEditarScreen> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-          child: SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: FilledButton(
-              onPressed: (_guardando || _cargandoRoles || _roleId == null) ? null : _guardar,
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.colorNavBar,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
-              child: _guardando
-                  ? const SizedBox(
-                      height: 22,
-                      width: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text(
-                      'Guardar cambios',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-            ),
+          child: AppActionButton(
+            label: 'Guardar cambios',
+            icon: Icons.check,
+            cargando: _guardando,
+            onPressed: (_guardando || _cargandoRoles || _roleId == null) ? null : _guardar,
           ),
         ),
       ),

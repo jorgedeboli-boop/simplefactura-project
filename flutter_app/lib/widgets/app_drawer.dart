@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../screens/login_screen.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_action_button.dart';
 
 enum ModuloApp {
   inicio('Inicio'),
@@ -130,9 +131,12 @@ class AppDrawer extends StatelessWidget {
             onPressed: () => Navigator.of(dialogContext).pop(false),
             child: const Text('Cancelar'),
           ),
-          FilledButton(
+          AppActionButton(
+            label: 'Cerrar sesión',
+            icon: Icons.logout,
+            expandido: false,
+            altura: 40,
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Cerrar sesión'),
           ),
         ],
       ),

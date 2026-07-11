@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_action_button.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -172,12 +173,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
-                              'Iniciar sesión',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                              ),
+                          : const AppActionButtonContent(
+                              label: 'Iniciar sesión',
+                              icon: Icons.login,
                             ),
                     ),
                   ),
@@ -319,15 +317,13 @@ class _DialogRecuperarPasswordState extends State<_DialogRecuperarPassword> {
           child: Text(_exito ? 'Cerrar' : 'Cancelar'),
         ),
         if (!_exito)
-          FilledButton(
+          AppActionButton(
+            label: 'Enviar instrucciones',
+            icon: Icons.send,
+            expandido: false,
+            altura: 40,
+            cargando: _enviando,
             onPressed: _enviando ? null : _enviarInstrucciones,
-            child: _enviando
-                ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                  )
-                : const Text('Enviar instrucciones'),
           ),
       ],
     );
