@@ -3,8 +3,6 @@
 // Simple Factura - Plantillas HTML de factura y utilidades de upload
 // ============================================================================
 
-require_once __DIR__ . '/../config/constantes.php';
-
 if (!defined('SF_UPLOADS_DIR')) {
     define('SF_UPLOADS_DIR', dirname(__DIR__) . '/uploads');
 }
@@ -15,32 +13,6 @@ if (!defined('SF_UPLOADS_DIR')) {
 function sf_ruta_uploads_tenant($identificadorTenant) {
     $identificador = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $identificadorTenant);
     return rtrim(SF_UPLOADS_DIR, '/\\') . DIRECTORY_SEPARATOR . $identificador;
-}
-
-/**
- * URL publica de un archivo subido del tenant.
- */
-function sf_url_upload_tenant($identificadorTenant, $nombreArchivo) {
-    $identificador = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $identificadorTenant);
-    $archivo = rawurlencode((string) $nombreArchivo);
-    return rtrim(SF_APP_URL, '/') . '/api/uploads/' . $identificador . '/' . $archivo;
-}
-
-/**
- * Valida y normaliza un color hexadecimal (#RGB o #RRGGBB).
- */
-function sf_normalizar_color_hex($color) {
-    $color = trim((string) $color);
-    if (!preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $color)) {
-        return null;
-    }
-    if (strlen($color) === 4) {
-        $r = $color[1];
-        $g = $color[2];
-        $b = $color[3];
-        return '#' . $r . $r . $g . $g . $b . $b;
-    }
-    return strtolower($color);
 }
 
 /**
@@ -143,19 +115,4 @@ function sf_guardar_logotipo_tenant($identificadorTenant, $bytes, $nombreOrigina
     }
 
     return $nombreFinal;
-}
-
-/**
- * Enriquece la fila de empresa_configuracion con URL del logo subido.
- */
-function sf_enriquecer_empresa_logotipo($fila, $identificadorTenant) {
-    if (!empty($fila['logotipo_file'])) {
-        $fila['logotipo_archivo_url'] = sf_url_upload_tenant(
-            $identificadorTenant,
-            $fila['logotipo_file']
-        );
-    } else {
-        $fila['logotipo_archivo_url'] = null;
-    }
-    return $fila;
 }

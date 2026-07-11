@@ -115,7 +115,15 @@ class ApiService {
       if (respuesta.statusCode >= 500 && cuerpoCrudo.isEmpty) {
         throw ApiException(
           'Error interno del servidor (${respuesta.statusCode}). '
-          'Comprueba que api/config/constantes.php en el hosting tenga las credenciales correctas de la base de datos.',
+          'Comprueba que el backend este actualizado y que la migracion '
+          '07_empresa_factura_personalizacion.sql este aplicada en la BD del tenant.',
+          respuesta.statusCode,
+        );
+      }
+
+      if (respuesta.statusCode >= 400 && cuerpoCrudo.isNotEmpty) {
+        throw ApiException(
+          'Error del servidor (${respuesta.statusCode}): $cuerpoCrudo',
           respuesta.statusCode,
         );
       }

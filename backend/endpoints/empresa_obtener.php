@@ -8,8 +8,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     responder_error('Metodo no permitido', 405);
 }
 
-require_once __DIR__ . '/../lib/plantilla_factura.php';
-
 $sesion = auth_requerir_sesion();
 $conexionTenant = db_conectar_tenant($sesion['tenant']);
 

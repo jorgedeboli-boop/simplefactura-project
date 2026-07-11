@@ -9,8 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'PUT' && $_SERVER['REQUEST_METHOD'] !== 'POST
     responder_error('Metodo no permitido', 405);
 }
 
-require_once __DIR__ . '/../lib/plantilla_factura.php';
-
 $sesion = auth_requerir_sesion();
 $conexionTenant = db_conectar_tenant($sesion['tenant']);
 
@@ -56,8 +54,8 @@ foreach ($camposPermitidos as $campo) {
             responder_error('El diseno de factura debe ser 1, 2 o 3', 400);
         }
         $sets[] = "$campo = ?";
-        $tipos .= 'i';
-        $valores[] = $diseno;
+        $tipos .= 's';
+        $valores[] = (string) $diseno;
         continue;
     }
 

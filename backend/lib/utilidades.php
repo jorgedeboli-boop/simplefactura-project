@@ -88,3 +88,27 @@ function calcular_totales_documento($lineas) {
         'total'     => round($subtotal + $totalIva, 2),
     );
 }
+
+/**
+ * URL publica de un archivo subido del tenant.
+ */
+function sf_url_upload_tenant($identificadorTenant, $nombreArchivo) {
+    $identificador = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $identificadorTenant);
+    $archivo = rawurlencode((string) $nombreArchivo);
+    return rtrim(SF_APP_URL, '/') . '/api/uploads/' . $identificador . '/' . $archivo;
+}
+
+/**
+ * Enriquece la fila de empresa_configuracion con URL del logo subido.
+ */
+function sf_enriquecer_empresa_logotipo($fila, $identificadorTenant) {
+    if (!empty($fila['logotipo_file'])) {
+        $fila['logotipo_archivo_url'] = sf_url_upload_tenant(
+            $identificadorTenant,
+            $fila['logotipo_file']
+        );
+    } else {
+        $fila['logotipo_archivo_url'] = null;
+    }
+    return $fila;
+}

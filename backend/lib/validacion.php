@@ -45,3 +45,20 @@ function a_decimal($valor, $default = 0.0) {
     }
     return (float) $valor;
 }
+
+/**
+ * Valida y normaliza un color hexadecimal (#RGB o #RRGGBB).
+ */
+function sf_normalizar_color_hex($color) {
+    $color = trim((string) $color);
+    if (!preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $color)) {
+        return null;
+    }
+    if (strlen($color) === 4) {
+        $r = $color[1];
+        $g = $color[2];
+        $b = $color[3];
+        return '#' . $r . $r . $g . $g . $b . $b;
+    }
+    return strtolower($color);
+}
