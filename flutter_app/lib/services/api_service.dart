@@ -46,7 +46,11 @@ class ApiService {
   }
 
   Map<String, String> _cabeceras() {
-    final cabeceras = {'Content-Type': 'application/json'};
+    final cabeceras = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'User-Agent': 'SimpleFacturaApp/1.0',
+    };
     final token = _tokenActivo;
     if (token != null && token.isNotEmpty) {
       cabeceras['Authorization'] = 'Bearer $token';
