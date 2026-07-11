@@ -8,6 +8,9 @@ enum TipoEmpresa {
   final String valor;
   final String etiqueta;
 
+  @override
+  String toString() => etiqueta;
+
   static TipoEmpresa fromValor(String? valor) {
     return TipoEmpresa.values.firstWhere(
       (tipo) => tipo.valor == valor,
