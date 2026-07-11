@@ -11,6 +11,7 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
     required this.busquedaController,
     required this.onAlternarBusqueda,
     required this.onBusquedaChanged,
+    required this.onCerrarBusqueda,
     this.mostrarBusqueda = false,
     this.hintBusqueda = 'Buscar',
   });
@@ -21,6 +22,7 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
   final String hintBusqueda;
   final TextEditingController busquedaController;
   final VoidCallback onAlternarBusqueda;
+  final VoidCallback onCerrarBusqueda;
   final ValueChanged<String> onBusquedaChanged;
 
   static const _altura = 56.0;
@@ -45,44 +47,11 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: onAlternarBusqueda,
               ),
               Expanded(
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    inputDecorationTheme: const InputDecorationTheme(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hoverColor: Colors.transparent,
-                      focusColor: Colors.transparent,
-                    ),
-                  ),
-                  child: TextField(
-                    controller: busquedaController,
-                    autofocus: true,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppTheme.colorTexto,
-                    ),
-                    cursorColor: AppTheme.colorNavBar,
-                    decoration: InputDecoration(
-                      hintText: hintBusqueda,
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 16,
-                      ),
-                      filled: true,
-                      fillColor: WidgetStateColor.resolveWith((_) => Colors.white),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      hoverColor: Colors.transparent,
-                      focusColor: Colors.transparent,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                    ),
-                    onChanged: onBusquedaChanged,
-                  ),
+                child: _CampoBusquedaNavBar(
+                  controller: busquedaController,
+                  hint: hintBusqueda,
+                  onChanged: onBusquedaChanged,
+                  onPerdioFoco: onCerrarBusqueda,
                 ),
               ),
             ],
@@ -113,6 +82,90 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ]
           : null,
+    );
+  }
+}
+
+class _CampoBusquedaNavBar extends StatefulWidget {
+  const _CampoBusquedaNavBar({
+    required this.controller,
+    required this.hint,
+    required this.onChanged,
+    required this.onPerdioFoco,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onPerdioFoco;
+
+  @override
+  State<_CampoBusquedaNavBar> createState() => _CampoBusquedaNavBarState();
+}
+
+class _CampoBusquedaNavBarState extends State<_CampoBusquedaNavBar> {
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(_alCambiarFoco);
+  }
+
+  void _alCambiarFoco() {
+    if (!_focusNode.hasFocus) widget.onPerdioFoco();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_alCambiarFoco);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          hoverColor: Colors.transparent,
+          focusColor: Colors.transparent,
+        ),
+      ),
+      child: TextField(
+        controller: widget.controller,
+        focusNode: _focusNode,
+        autofocus: true,
+        style: const TextStyle(
+          fontSize: 16,
+          color: AppTheme.colorTexto,
+        ),
+        cursorColor: AppTheme.colorNavBar,
+        decoration: InputDecoration(
+          hintText: widget.hint,
+          hintStyle: TextStyle(
+            color: Colors.grey.shade500,
+            fontSize: 16,
+          ),
+          filled: true,
+          fillColor: WidgetStateColor.resolveWith((_) => Colors.white),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          hoverColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(vertical: 18),
+        ),
+        onChanged: widget.onChanged,
+        onTapOutside: (_) => _focusNode.unfocus(),
+      ),
     );
   }
 }

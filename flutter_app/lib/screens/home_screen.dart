@@ -45,6 +45,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _cerrarBusqueda() {
+    if (!_busquedaActiva) return;
+    setState(() {
+      _busquedaActiva = false;
+      _busqueda = '';
+      _buscadorController.clear();
+    });
+  }
+
   void _onBusquedaChanged(String valor) {
     setState(() => _busqueda = valor);
   }
@@ -59,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
         hintBusqueda: _moduloActual.hintBusqueda,
         busquedaController: _buscadorController,
         onAlternarBusqueda: _alternarBusqueda,
+        onCerrarBusqueda: _cerrarBusqueda,
         onBusquedaChanged: _onBusquedaChanged,
       ),
       drawer: AppDrawer(
