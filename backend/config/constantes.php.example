@@ -17,4 +17,5 @@ define('SF_CORREO_REMITENTE', 'noreply@simplefactura.app');
 
 date_default_timezone_set('UTC');
 
-define('SF_DEBUG', false);
+// true en local para ver detalles de errores de BD en JSON (nunca en produccion)
+define('SF_DEBUG', true);

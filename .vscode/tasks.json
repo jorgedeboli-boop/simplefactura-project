@@ -12,6 +12,14 @@
       }
     },
     {
+      "label": "🍎 iOS dev (simulador + API)",
+      "dependsOn": [
+        "📱 Abrir simulador iOS",
+        "🐘 API PHP local"
+      ],
+      "dependsOrder": "parallel"
+    },
+    {
       "label": "🐘 API PHP local",
       "type": "shell",
       "command": "bash",

@@ -11,12 +11,17 @@ require_once __DIR__ . '/constantes.php';
  * @return mysqli|resource conexion mysqli (procedural)
  */
 function db_conectar_control() {
-    $conexion = mysqli_connect(
-        SF_CONTROL_DB_HOST,
-        SF_CONTROL_DB_USER,
-        SF_CONTROL_DB_PASS,
-        SF_CONTROL_DB_NAME
-    );
+    try {
+        $conexion = mysqli_connect(
+            SF_CONTROL_DB_HOST,
+            SF_CONTROL_DB_USER,
+            SF_CONTROL_DB_PASS,
+            SF_CONTROL_DB_NAME
+        );
+    } catch (mysqli_sql_exception $e) {
+        $detalle = defined('SF_DEBUG') && SF_DEBUG ? $e->getMessage() : null;
+        responder_error('No se pudo conectar a la base de datos de control', 500, $detalle);
+    }
 
     if (!$conexion) {
         responder_error('No se pudo conectar a la base de datos de control', 500);
@@ -33,12 +38,17 @@ function db_conectar_control() {
  * @return mysqli|resource conexion mysqli (procedural)
  */
 function db_conectar_tenant($tenant) {
-    $conexion = mysqli_connect(
-        $tenant['db_host'],
-        $tenant['db_usuario'],
-        $tenant['db_password'],
-        $tenant['db_name']
-    );
+    try {
+        $conexion = mysqli_connect(
+            $tenant['db_host'],
+            $tenant['db_usuario'],
+            $tenant['db_password'],
+            $tenant['db_name']
+        );
+    } catch (mysqli_sql_exception $e) {
+        $detalle = defined('SF_DEBUG') && SF_DEBUG ? $e->getMessage() : null;
+        responder_error('No se pudo conectar a la base de datos del cliente', 500, $detalle);
+    }
 
     if (!$conexion) {
         responder_error('No se pudo conectar a la base de datos del cliente', 500);

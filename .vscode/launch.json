@@ -9,7 +9,19 @@
       "cwd": "${workspaceFolder}/flutter_app",
       "deviceId": "8DEFF3D4-A940-4561-B260-A5059FAD7B11",
       "args": [
-        "--dart-define=API_BASE_URL=http://localhost:8080/index.php"
+        "--dart-define=API_BASE_URL=http://127.0.0.1:8080/index.php"
+      ],
+      "preLaunchTask": "🍎 iOS dev (simulador + API)"
+    },
+    {
+      "name": "Flutter iOS (producción)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}/flutter_app",
+      "deviceId": "8DEFF3D4-A940-4561-B260-A5059FAD7B11",
+      "args": [
+        "--dart-define=API_BASE_URL=https://my.simplefactura.app/api/index.php"
       ],
       "preLaunchTask": "📱 Abrir simulador iOS"
     },
