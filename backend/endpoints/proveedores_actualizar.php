@@ -52,7 +52,7 @@ $resultado = db_ejecutar(
         notas = ?,
         estado = ?
      WHERE id = ?",
-    'sssissssssssi',
+    'sssisssssssssi',
     array(
         $tipo,
         limpiar_texto($entrada['nombre_razon_social']),

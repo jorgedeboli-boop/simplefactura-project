@@ -32,7 +32,7 @@ $resultado = db_ejecutar(
         (tipo, nombre_razon_social, identificacion_fiscal, pais_id, direccion,
          ciudad, provincia_estado, codigo_postal, telefono, email, persona_contacto, notas, estado)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'activo')",
-    'sssisssssss',
+    'sssissssssss',
     array(
         $tipo,
         limpiar_texto($entrada['nombre_razon_social']),

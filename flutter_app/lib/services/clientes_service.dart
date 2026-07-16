@@ -22,7 +22,7 @@ class ClientesService {
   }
 
   Future<ContactoListado> actualizar(Map<String, dynamic> datos) async {
-    final data = await _api.put('clientes_actualizar', datos);
+    final data = await _api.post('clientes_actualizar', datos);
     return ContactoListado.fromJson(data as Map<String, dynamic>);
   }
 }
