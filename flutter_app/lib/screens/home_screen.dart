@@ -5,8 +5,12 @@ import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/app_nav_bar.dart';
+import 'clientes_screen.dart';
 import 'empresa_ficha_screen.dart';
+import 'facturas_screen.dart';
 import 'personalizar_factura_screen.dart';
+import 'presupuestos_screen.dart';
+import 'proveedores_screen.dart';
 import 'usuarios_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -159,6 +163,22 @@ class _ContenidoModulo extends StatelessWidget {
 
     if (modulo == ModuloApp.usuarios) {
       return UsuariosScreen(busqueda: busqueda);
+    }
+
+    if (modulo == ModuloApp.clientes) {
+      return ClientesScreen(busqueda: busqueda);
+    }
+
+    if (modulo == ModuloApp.proveedores) {
+      return ProveedoresScreen(busqueda: busqueda);
+    }
+
+    if (modulo == ModuloApp.presupuestos) {
+      return PresupuestosScreen(busqueda: busqueda);
+    }
+
+    if (modulo == ModuloApp.facturas) {
+      return FacturasScreen(busqueda: busqueda);
     }
 
     if (modulo == ModuloApp.datosEmpresa) {

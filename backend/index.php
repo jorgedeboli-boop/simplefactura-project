@@ -12,6 +12,7 @@ require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/lib/auth.php';
 require_once __DIR__ . '/lib/validacion.php';
 require_once __DIR__ . '/lib/utilidades.php';
+require_once __DIR__ . '/lib/documentos.php';
 require_once __DIR__ . '/lib/conexiones.php';
 
 register_shutdown_function(function () {
@@ -68,6 +69,21 @@ $rutas = array(
 
     'clientes_listar'     => 'endpoints/clientes_listar.php',
     'clientes_crear'      => 'endpoints/clientes_crear.php',
+    'clientes_actualizar' => 'endpoints/clientes_actualizar.php',
+
+    'proveedores_listar'     => 'endpoints/proveedores_listar.php',
+    'proveedores_crear'      => 'endpoints/proveedores_crear.php',
+    'proveedores_actualizar' => 'endpoints/proveedores_actualizar.php',
+
+    'presupuestos_listar'     => 'endpoints/presupuestos_listar.php',
+    'presupuestos_obtener'    => 'endpoints/presupuestos_obtener.php',
+    'presupuestos_crear'      => 'endpoints/presupuestos_crear.php',
+    'presupuestos_actualizar' => 'endpoints/presupuestos_actualizar.php',
+
+    'facturas_listar'     => 'endpoints/facturas_listar.php',
+    'facturas_obtener'    => 'endpoints/facturas_obtener.php',
+    'facturas_crear'      => 'endpoints/facturas_crear.php',
+    'facturas_actualizar' => 'endpoints/facturas_actualizar.php',
 );
 
 $accion = isset($_GET['accion']) ? $_GET['accion'] : null;
