@@ -184,18 +184,10 @@ class _PresupuestoEditarScreenState extends State<PresupuestoEditarScreen> {
                   trailing: const Icon(Icons.event_outlined),
                   onTap: _guardando ? null : () => _seleccionarFecha(validez: true),
                 ),
-                DropdownButtonFormField<String>(
-                  key: ValueKey(_estado),
-                  initialValue: _estado,
-                  decoration: const InputDecoration(labelText: 'Estado'),
-                  items: const [
-                    DropdownMenuItem(value: 'borrador', child: Text('Borrador')),
-                    DropdownMenuItem(value: 'enviado', child: Text('Enviado')),
-                    DropdownMenuItem(value: 'aceptado', child: Text('Aceptado')),
-                    DropdownMenuItem(value: 'rechazado', child: Text('Rechazado')),
-                    DropdownMenuItem(value: 'facturado', child: Text('Facturado')),
-                  ],
-                  onChanged: _guardando ? null : (v) => setState(() => _estado = v ?? 'borrador'),
+                SelectorEstadoPresupuesto(
+                  valor: _estado,
+                  habilitado: !_guardando,
+                  onChanged: (v) => setState(() => _estado = v),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(

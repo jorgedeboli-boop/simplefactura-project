@@ -171,22 +171,14 @@ class _FacturaCrearScreenState extends State<FacturaCrearScreen> {
           : ListView(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
               children: [
-                DropdownButtonFormField<String>(
-                  key: ValueKey(_tipoFactura),
-                  initialValue: _tipoFactura,
-                  decoration: const InputDecoration(labelText: 'Tipo de factura'),
-                  items: const [
-                    DropdownMenuItem(value: 'normal', child: Text('Normal')),
-                    DropdownMenuItem(value: 'simplificada', child: Text('Simplificada')),
-                    DropdownMenuItem(value: 'rectificativa', child: Text('Rectificativa')),
-                  ],
-                  onChanged: _guardando
-                      ? null
-                      : (v) => setState(() {
-                            _tipoFactura = v ?? 'normal';
-                            if (_clienteOpcional) _clienteId = null;
-                            _actualizarMoneda();
-                          }),
+                SelectorTipoFactura(
+                  valor: _tipoFactura,
+                  habilitado: !_guardando,
+                  onChanged: (v) => setState(() {
+                    _tipoFactura = v;
+                    if (_clienteOpcional) _clienteId = null;
+                    _actualizarMoneda();
+                  }),
                 ),
                 const SizedBox(height: 16),
                 SelectorCliente(
@@ -224,18 +216,10 @@ class _FacturaCrearScreenState extends State<FacturaCrearScreen> {
                   trailing: const Icon(Icons.event_outlined),
                   onTap: _guardando ? null : () => _seleccionarFecha(vencimiento: true),
                 ),
-                DropdownButtonFormField<String>(
-                  key: ValueKey(_estado),
-                  initialValue: _estado,
-                  decoration: const InputDecoration(labelText: 'Estado'),
-                  items: const [
-                    DropdownMenuItem(value: 'borrador', child: Text('Borrador')),
-                    DropdownMenuItem(value: 'emitida', child: Text('Emitida')),
-                    DropdownMenuItem(value: 'pagada', child: Text('Pagada')),
-                    DropdownMenuItem(value: 'vencida', child: Text('Vencida')),
-                    DropdownMenuItem(value: 'anulada', child: Text('Anulada')),
-                  ],
-                  onChanged: _guardando ? null : (v) => setState(() => _estado = v ?? 'emitida'),
+                SelectorEstadoFactura(
+                  valor: _estado,
+                  habilitado: !_guardando,
+                  onChanged: (v) => setState(() => _estado = v),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(

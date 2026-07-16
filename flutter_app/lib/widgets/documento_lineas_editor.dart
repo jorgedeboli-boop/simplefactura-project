@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../models/documento_linea.dart';
 import '../models/iva_tipo.dart';
 import '../theme/app_theme.dart';
+import 'selectores_contacto.dart';
 
 class DocumentoLineasEditor extends StatefulWidget {
   const DocumentoLineasEditor({
@@ -297,20 +298,12 @@ class _LineaEditor extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          DropdownButtonFormField<int>(
+          SelectorIvaTipo(
             key: ValueKey(linea.ivaTipoId),
-            initialValue: ivaTipos.any((t) => t.id == linea.ivaTipoId)
-                ? linea.ivaTipoId
-                : (ivaTipos.isNotEmpty ? ivaTipos.first.id : null),
-            decoration: const InputDecoration(labelText: 'IVA', isDense: true),
-            items: ivaTipos
-                .map((t) => DropdownMenuItem(value: t.id, child: Text(t.etiqueta)))
-                .toList(),
-            onChanged: habilitado
-                ? (id) {
-                    if (id != null) onChanged(linea.copyWith(ivaTipoId: id));
-                  }
-                : null,
+            ivaTipos: ivaTipos,
+            valor: linea.ivaTipoId,
+            habilitado: habilitado,
+            onChanged: (id) => onChanged(linea.copyWith(ivaTipoId: id)),
           ),
           const SizedBox(height: 8),
           Align(
