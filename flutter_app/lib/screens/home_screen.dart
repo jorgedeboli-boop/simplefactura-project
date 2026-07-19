@@ -81,6 +81,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   PreferredSizeWidget _appBar({required bool menuFijo}) {
+    final mq = MediaQuery.of(context);
+    final topInset = mq.viewPadding.top > mq.padding.top
+        ? mq.viewPadding.top
+        : mq.padding.top;
+
     return AppNavBar(
       titulo: _moduloActual.titulo,
       busquedaActiva: _busquedaActiva,
@@ -91,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onCerrarBusqueda: _cerrarBusqueda,
       onBusquedaChanged: _onBusquedaChanged,
       leading: _botonMenu(menuFijo: menuFijo),
-      topInset: MediaQuery.viewPaddingOf(context).top,
+      topInset: topInset,
     );
   }
 
