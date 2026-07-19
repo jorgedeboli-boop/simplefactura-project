@@ -12,15 +12,32 @@ class FacturasService {
     return _parseCompleto(data as Map<String, dynamic>);
   }
 
-  Future<List<FacturaListado>> listar({String? busqueda}) async {
+  Future<List<FacturaListado>> listar({String? busqueda, int? clienteId}) async {
+    final parametros = <String, String>{};
+    if (busqueda != null && busqueda.isNotEmpty) {
+      parametros['busqueda'] = busqueda;
+    }
+    if (clienteId != null) {
+      parametros['cliente_id'] = '$clienteId';
+    }
     final data = await _api.get(
       'facturas_listar',
-      parametros: busqueda != null && busqueda.isNotEmpty ? {'busqueda': busqueda} : null,
+      parametros: parametros.isEmpty ? null : parametros,
     );
     final lista = data as List<dynamic>;
     return lista
         .map((item) => FacturaListado.fromJson(item as Map<String, dynamic>))
         .toList();
+  }
+
+  /// HTML imprimible de la factura (plantilla con datos reales).
+  Future<String> htmlImprimir(int id) async {
+    final data = await _api.get('facturas_imprimir', parametros: {
+      'id': '$id',
+      'formato': 'json',
+    });
+    final mapa = data as Map<String, dynamic>;
+    return mapa['html'] as String? ?? '';
   }
 
   Future<({FacturaListado factura, List<DocumentoLinea> lineas})> crear(

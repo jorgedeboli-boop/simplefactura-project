@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../models/contacto_listado.dart';
 import '../services/proveedores_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/ficha_campos.dart';
 import '../widgets/panel_lateral.dart';
 import 'proveedor_editar_screen.dart';
 
@@ -46,6 +47,38 @@ class _ProveedorFichaScreenState extends State<ProveedorFichaScreen> {
 
   void _volver() => Navigator.of(context).pop(_modificado);
 
+  List<FichaCampo> get _campos {
+    final p = _proveedor;
+    return [
+      FichaCampo(etiqueta: 'ID', valor: '${p.id}'),
+      FichaCampo(etiqueta: 'Tipo', valor: p.tipo.etiqueta),
+      FichaCampo(etiqueta: 'Nombre / Razón social', valor: p.nombreRazonSocial),
+      if (p.identificacionFiscal?.isNotEmpty == true)
+        FichaCampo(etiqueta: 'Identificación fiscal', valor: p.identificacionFiscal!),
+      FichaCampo(etiqueta: 'País', valor: p.paisNombre ?? '—'),
+      if (p.direccion?.isNotEmpty == true) FichaCampo(etiqueta: 'Dirección', valor: p.direccion!),
+      if (p.ciudad?.isNotEmpty == true) FichaCampo(etiqueta: 'Ciudad', valor: p.ciudad!),
+      if (p.provinciaEstado?.isNotEmpty == true)
+        FichaCampo(etiqueta: 'Provincia / Estado', valor: p.provinciaEstado!),
+      if (p.codigoPostal?.isNotEmpty == true)
+        FichaCampo(etiqueta: 'Código postal', valor: p.codigoPostal!),
+      if (p.telefono?.isNotEmpty == true) FichaCampo(etiqueta: 'Teléfono', valor: p.telefono!),
+      if (p.email?.isNotEmpty == true) FichaCampo(etiqueta: 'Email', valor: p.email!),
+      if (p.personaContacto?.isNotEmpty == true)
+        FichaCampo(etiqueta: 'Persona de contacto', valor: p.personaContacto!),
+      if (p.notas?.isNotEmpty == true) FichaCampo(etiqueta: 'Notas', valor: p.notas!),
+      FichaCampo(
+        etiqueta: 'Estado',
+        valor: p.activo ? 'Activo' : 'Inactivo',
+        valorColor: p.activo ? AppTheme.colorExito : AppTheme.colorError,
+      ),
+      FichaCampo(
+        etiqueta: 'Fecha creación',
+        valor: _formatoFecha.format(p.fechaCreacion.toLocal()),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -60,64 +93,10 @@ class _ProveedorFichaScreenState extends State<ProveedorFichaScreen> {
           leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: _volver),
           title: Text(_proveedor.nombreRazonSocial, maxLines: 1, overflow: TextOverflow.ellipsis),
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Material(
-                color: Colors.white.withValues(alpha: 0.2),
-                shape: const CircleBorder(),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  onTap: _editar,
-                  customBorder: const CircleBorder(),
-                  child: const SizedBox(width: 36, height: 36, child: Icon(Icons.edit, color: Colors.white, size: 18)),
-                ),
-              ),
-            ),
+            FichaBotonAppBar(icon: Icons.edit, onTap: _editar, tooltip: 'Editar'),
           ],
         ),
-        body: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            _CampoDetalle(etiqueta: 'ID', valor: '${_proveedor.id}'),
-            _CampoDetalle(etiqueta: 'Tipo', valor: _proveedor.tipo.etiqueta),
-            _CampoDetalle(etiqueta: 'Nombre / Razón social', valor: _proveedor.nombreRazonSocial),
-            if (_proveedor.identificacionFiscal?.isNotEmpty == true)
-              _CampoDetalle(etiqueta: 'Identificación fiscal', valor: _proveedor.identificacionFiscal!),
-            _CampoDetalle(etiqueta: 'País', valor: _proveedor.paisNombre ?? '—'),
-            if (_proveedor.direccion?.isNotEmpty == true) _CampoDetalle(etiqueta: 'Dirección', valor: _proveedor.direccion!),
-            if (_proveedor.ciudad?.isNotEmpty == true) _CampoDetalle(etiqueta: 'Ciudad', valor: _proveedor.ciudad!),
-            if (_proveedor.telefono?.isNotEmpty == true) _CampoDetalle(etiqueta: 'Teléfono', valor: _proveedor.telefono!),
-            if (_proveedor.email?.isNotEmpty == true) _CampoDetalle(etiqueta: 'Email', valor: _proveedor.email!),
-            _CampoDetalle(
-              etiqueta: 'Estado',
-              valor: _proveedor.activo ? 'Activo' : 'Inactivo',
-              valorColor: _proveedor.activo ? AppTheme.colorExito : AppTheme.colorError,
-            ),
-            _CampoDetalle(etiqueta: 'Fecha creación', valor: _formatoFecha.format(_proveedor.fechaCreacion.toLocal())),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CampoDetalle extends StatelessWidget {
-  const _CampoDetalle({required this.etiqueta, required this.valor, this.valorColor});
-  final String etiqueta;
-  final String valor;
-  final Color? valorColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(etiqueta, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.colorTexto.withValues(alpha: 0.55))),
-          const SizedBox(height: 4),
-          Text(valor, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: valorColor ?? AppTheme.colorTexto, fontWeight: FontWeight.w500)),
-        ],
+        body: SingleChildScrollView(child: FichaCamposGrid(campos: _campos)),
       ),
     );
   }

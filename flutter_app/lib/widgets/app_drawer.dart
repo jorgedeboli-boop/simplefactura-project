@@ -122,6 +122,7 @@ class _AppMenuPanelState extends State<AppMenuPanel> {
           Expanded(
             child: SafeArea(
               top: false,
+              bottom: false,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -179,9 +180,14 @@ class _AppMenuPanelState extends State<AppMenuPanel> {
               ),
             ),
             const Divider(color: Colors.white24, height: 1),
-            ListTile(
-              title: Text('Cerrar sesión', style: AppTheme.textoDrawerSecundario),
-              onTap: () => _solicitarCerrarSesion(context, auth),
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.viewPaddingOf(context).bottom + 20,
+              ),
+              child: ListTile(
+                title: Text('Cerrar sesión', style: AppTheme.textoDrawerSecundario),
+                onTap: () => _solicitarCerrarSesion(context, auth),
+              ),
             ),
                 ],
               ),

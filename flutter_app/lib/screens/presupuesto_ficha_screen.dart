@@ -8,6 +8,7 @@ import '../services/presupuestos_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_action_button.dart';
 import '../widgets/estado_chip.dart';
+import '../widgets/ficha_campos.dart';
 import '../widgets/panel_lateral.dart';
 import 'presupuesto_editar_screen.dart';
 
@@ -43,6 +44,23 @@ class _PresupuestoFichaScreenState extends State<PresupuestoFichaScreen> {
   }
 
   String _moneda(double valor) => '${_formatoMoneda.format(valor)} ${_presupuesto.monedaCodigo}';
+
+  List<FichaCampo> get _campos => [
+        FichaCampo(etiqueta: 'Cliente', valor: _presupuesto.clienteNombre),
+        FichaCampo(
+          etiqueta: 'Fecha emisión',
+          valor: _formatoFecha.format(_presupuesto.fechaEmision),
+        ),
+        FichaCampo(
+          etiqueta: 'Fecha validez',
+          valor: _presupuesto.fechaValidez != null
+              ? _formatoFecha.format(_presupuesto.fechaValidez!)
+              : '—',
+        ),
+        FichaCampo(etiqueta: 'Moneda', valor: _presupuesto.monedaCodigo),
+        if (_presupuesto.notas?.isNotEmpty == true)
+          FichaCampo(etiqueta: 'Notas', valor: _presupuesto.notas!),
+      ];
 
   Future<void> _cargarCompleto() async {
     setState(() {
@@ -109,18 +127,10 @@ class _PresupuestoFichaScreenState extends State<PresupuestoFichaScreen> {
           leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: _volver),
           title: Text(_presupuesto.numeroPresupuesto, maxLines: 1, overflow: TextOverflow.ellipsis),
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Material(
-                color: Colors.white.withValues(alpha: 0.2),
-                shape: const CircleBorder(),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  onTap: _cargando ? null : _editar,
-                  customBorder: const CircleBorder(),
-                  child: const SizedBox(width: 36, height: 36, child: Icon(Icons.edit, color: Colors.white, size: 18)),
-                ),
-              ),
+            FichaBotonAppBar(
+              icon: Icons.edit,
+              onTap: _cargando ? null : _editar,
+              tooltip: 'Editar',
             ),
           ],
         ),
@@ -133,82 +143,89 @@ class _PresupuestoFichaScreenState extends State<PresupuestoFichaScreen> {
                       children: [
                         Text(_error!),
                         const SizedBox(height: 16),
-                        AppActionButton(label: 'Reintentar', icon: Icons.refresh, expandido: false, onPressed: _cargarCompleto),
+                        AppActionButton(
+                          label: 'Reintentar',
+                          icon: Icons.refresh,
+                          expandido: false,
+                          onPressed: _cargarCompleto,
+                        ),
                       ],
                     ),
                   )
                 : ListView(
-                    padding: const EdgeInsets.all(24),
                     children: [
-                      Wrap(
-                        spacing: 8,
-                        children: [
-                          EstadoDocumentoChip(
-                            etiqueta: _presupuesto.estadoEtiqueta,
-                            color: ColoresEstadoDocumento.presupuesto(_presupuesto.estado),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      _CampoDetalle(etiqueta: 'Cliente', valor: _presupuesto.clienteNombre),
-                      _CampoDetalle(etiqueta: 'Fecha emisión', valor: _formatoFecha.format(_presupuesto.fechaEmision)),
-                      _CampoDetalle(
-                        etiqueta: 'Fecha validez',
-                        valor: _presupuesto.fechaValidez != null
-                            ? _formatoFecha.format(_presupuesto.fechaValidez!)
-                            : '—',
-                      ),
-                      _CampoDetalle(etiqueta: 'Moneda', valor: _presupuesto.monedaCodigo),
-                      if (_presupuesto.notas?.isNotEmpty == true)
-                        _CampoDetalle(etiqueta: 'Notas', valor: _presupuesto.notas!),
-                      const SizedBox(height: 16),
-                      Text('Líneas', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 12),
-                      if (_lineas.isEmpty)
-                        Text('Sin líneas', style: TextStyle(color: AppTheme.colorTexto.withValues(alpha: 0.55)))
-                      else
-                        ..._lineas.map((linea) => _LineaLectura(linea: linea, moneda: _presupuesto.monedaCodigo)),
-                      const SizedBox(height: 24),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppTheme.colorTexto.withValues(alpha: 0.08)),
-                        ),
-                        child: Column(
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                        child: Wrap(
+                          spacing: 8,
                           children: [
-                            _FilaTotal(etiqueta: 'Subtotal', valor: _moneda(_presupuesto.subtotal)),
-                            const SizedBox(height: 8),
-                            _FilaTotal(etiqueta: 'IVA', valor: _moneda(_presupuesto.totalIva)),
-                            const Divider(height: 24),
-                            _FilaTotal(etiqueta: 'Total', valor: _moneda(_presupuesto.total), destacado: true),
+                            EstadoDocumentoChip(
+                              etiqueta: _presupuesto.estadoEtiqueta,
+                              color: ColoresEstadoDocumento.presupuesto(_presupuesto.estado),
+                            ),
+                          ],
+                        ),
+                      ),
+                      FichaCamposGrid(campos: _campos),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Líneas',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                            const SizedBox(height: 12),
+                            if (_lineas.isEmpty)
+                              Text(
+                                'Sin líneas',
+                                style: TextStyle(color: AppTheme.colorTexto.withValues(alpha: 0.55)),
+                              )
+                            else
+                              ..._lineas.map(
+                                (linea) => _LineaLectura(
+                                  linea: linea,
+                                  moneda: _presupuesto.monedaCodigo,
+                                ),
+                              ),
+                            const SizedBox(height: 24),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: AppTheme.colorTexto.withValues(alpha: 0.08),
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  _FilaTotal(
+                                    etiqueta: 'Subtotal',
+                                    valor: _moneda(_presupuesto.subtotal),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  _FilaTotal(
+                                    etiqueta: 'IVA',
+                                    valor: _moneda(_presupuesto.totalIva),
+                                  ),
+                                  const Divider(height: 24),
+                                  _FilaTotal(
+                                    etiqueta: 'Total',
+                                    valor: _moneda(_presupuesto.total),
+                                    destacado: true,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
-      ),
-    );
-  }
-}
-
-class _CampoDetalle extends StatelessWidget {
-  const _CampoDetalle({required this.etiqueta, required this.valor});
-  final String etiqueta;
-  final String valor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(etiqueta, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.colorTexto.withValues(alpha: 0.55))),
-          const SizedBox(height: 4),
-          Text(valor, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
-        ],
       ),
     );
   }
@@ -238,12 +255,17 @@ class _LineaLectura extends StatelessWidget {
                 Text(linea.descripcion, style: const TextStyle(fontWeight: FontWeight.w500)),
                 Text(
                   '${linea.cantidad} × ${linea.precioUnitario.toStringAsFixed(2)} · IVA: ${linea.ivaTipoNombre ?? linea.ivaTipoId}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.colorTexto.withValues(alpha: 0.6)),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.colorTexto.withValues(alpha: 0.6),
+                      ),
                 ),
               ],
             ),
           ),
-          Text('${linea.importeLinea.toStringAsFixed(2)} $moneda', style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(
+            '${linea.importeLinea.toStringAsFixed(2)} $moneda',
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
         ],
       ),
     );

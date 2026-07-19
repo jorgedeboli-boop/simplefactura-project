@@ -85,6 +85,7 @@ $rutas = array(
     'facturas_obtener'    => 'endpoints/facturas_obtener.php',
     'facturas_crear'      => 'endpoints/facturas_crear.php',
     'facturas_actualizar' => 'endpoints/facturas_actualizar.php',
+    'facturas_imprimir'   => 'endpoints/facturas_imprimir.php',
 );
 
 $accion = isset($_GET['accion']) ? $_GET['accion'] : null;

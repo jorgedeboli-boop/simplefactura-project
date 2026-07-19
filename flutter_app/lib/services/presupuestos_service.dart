@@ -12,10 +12,17 @@ class PresupuestosService {
     return _parseCompleto(data as Map<String, dynamic>);
   }
 
-  Future<List<PresupuestoListado>> listar({String? busqueda}) async {
+  Future<List<PresupuestoListado>> listar({String? busqueda, int? clienteId}) async {
+    final parametros = <String, String>{};
+    if (busqueda != null && busqueda.isNotEmpty) {
+      parametros['busqueda'] = busqueda;
+    }
+    if (clienteId != null) {
+      parametros['cliente_id'] = '$clienteId';
+    }
     final data = await _api.get(
       'presupuestos_listar',
-      parametros: busqueda != null && busqueda.isNotEmpty ? {'busqueda': busqueda} : null,
+      parametros: parametros.isEmpty ? null : parametros,
     );
     final lista = data as List<dynamic>;
     return lista
