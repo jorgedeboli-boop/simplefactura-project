@@ -8,6 +8,7 @@ import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_action_button.dart';
+import '../widgets/transicion_auth.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -70,6 +71,10 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       TextInput.finishAutofillContext(shouldSave: true);
       if (!mounted) return;
+
+      await TransicionAuth.mostrar(context, mensaje: 'Iniciando APP...');
+      if (!mounted) return;
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );

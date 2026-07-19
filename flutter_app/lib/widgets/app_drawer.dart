@@ -5,8 +5,9 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../screens/login_screen.dart';
 import '../theme/app_theme.dart';
-import 'app_action_button.dart';
 import '../utils/platform_view_guard.dart';
+import 'app_action_button.dart';
+import 'transicion_auth.dart';
 
 enum ModuloApp {
   inicio('Inicio'),
@@ -214,8 +215,15 @@ Future<void> _solicitarCerrarSesion(
   );
 
   if (confirmar != true) return;
+  if (!context.mounted) return;
 
-  await auth.cerrarSesion();
+  // Transición azul desde abajo + 3 s con loader antes de cerrar.
+  await Future.wait([
+    TransicionAuth.mostrar(context, mensaje: 'Cerrando APP...'),
+    auth.cerrarSesion(),
+  ]);
+
+  if (!context.mounted) return;
 
   navigator.pushAndRemoveUntil(
     MaterialPageRoute(builder: (_) => const LoginScreen()),
