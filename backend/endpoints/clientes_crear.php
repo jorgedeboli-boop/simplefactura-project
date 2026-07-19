@@ -18,12 +18,24 @@ auth_requerir_permiso($conexionTenant, $sesion['usuario_id'], 'clientes.crear');
 $entrada = leer_json_entrada();
 validar_campos_requeridos($entrada, array('nombre_razon_social', 'pais_id'));
 
-$tipo = isset($entrada['tipo']) && in_array($entrada['tipo'], array('particular', 'empresa'))
+$tipo = isset($entrada['tipo']) && in_array($entrada['tipo'], array('particular', 'empresa'), true)
     ? $entrada['tipo']
     : 'empresa';
 
-if (isset($entrada['email']) && $entrada['email'] !== '' && !validar_email($entrada['email'])) {
+$email = contacto_texto_opcional(isset($entrada['email']) ? $entrada['email'] : null);
+if ($email !== null && !validar_email($email)) {
     responder_error('El email no tiene un formato valido', 400);
+}
+
+$paisId = (int) $entrada['pais_id'];
+$paises = db_consultar(
+    $conexionTenant,
+    "SELECT id FROM paises WHERE id = ? LIMIT 1",
+    'i',
+    array($paisId)
+);
+if (count($paises) === 0) {
+    responder_error('Pais no encontrado', 400);
 }
 
 $resultado = db_ejecutar(
@@ -36,16 +48,16 @@ $resultado = db_ejecutar(
     array(
         $tipo,
         limpiar_texto($entrada['nombre_razon_social']),
-        isset($entrada['identificacion_fiscal']) ? limpiar_texto($entrada['identificacion_fiscal']) : null,
-        (int) $entrada['pais_id'],
-        isset($entrada['direccion']) ? limpiar_texto($entrada['direccion']) : null,
-        isset($entrada['ciudad']) ? limpiar_texto($entrada['ciudad']) : null,
-        isset($entrada['provincia_estado']) ? limpiar_texto($entrada['provincia_estado']) : null,
-        isset($entrada['codigo_postal']) ? limpiar_texto($entrada['codigo_postal']) : null,
-        isset($entrada['telefono']) ? limpiar_texto($entrada['telefono']) : null,
-        isset($entrada['email']) ? limpiar_texto($entrada['email']) : null,
-        isset($entrada['persona_contacto']) ? limpiar_texto($entrada['persona_contacto']) : null,
-        isset($entrada['notas']) ? limpiar_texto($entrada['notas']) : null,
+        contacto_texto_opcional(isset($entrada['identificacion_fiscal']) ? $entrada['identificacion_fiscal'] : null),
+        $paisId,
+        contacto_texto_opcional(isset($entrada['direccion']) ? $entrada['direccion'] : null),
+        contacto_texto_opcional(isset($entrada['ciudad']) ? $entrada['ciudad'] : null),
+        contacto_texto_opcional(isset($entrada['provincia_estado']) ? $entrada['provincia_estado'] : null),
+        contacto_texto_opcional(isset($entrada['codigo_postal']) ? $entrada['codigo_postal'] : null),
+        contacto_texto_opcional(isset($entrada['telefono']) ? $entrada['telefono'] : null),
+        $email,
+        contacto_texto_opcional(isset($entrada['persona_contacto']) ? $entrada['persona_contacto'] : null),
+        contacto_texto_opcional(isset($entrada['notas']) ? $entrada['notas'] : null),
     )
 );
 

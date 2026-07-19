@@ -18,29 +18,115 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Simple Factura — facturación sencilla">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="simple_factura">
+  <meta name="apple-mobile-web-app-title" content="Simple Factura">
+  <meta name="theme-color" content="#2196F3">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>simple_factura</title>
+  <title>Simple Factura</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #F5F7FA;
+    }
+
+    #sf-loading {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F5F7FA;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      transition: opacity 0.28s ease, visibility 0.28s ease;
+    }
+
+    #sf-loading.sf-oculto {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #sf-loading .sf-contenido {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    #sf-loading .sf-marca {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #1C2733;
+    }
+
+    #sf-loading .sf-marca span {
+      color: #2196F3;
+    }
+
+    #sf-loading .sf-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(33, 150, 243, 0.18);
+      border-top-color: #2196F3;
+      border-radius: 50%;
+      animation: sf-girar 0.75s linear infinite;
+    }
+
+    #sf-loading .sf-texto {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 500;
+      color: rgba(28, 39, 51, 0.65);
+    }
+
+    @keyframes sf-girar {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="sf-loading" role="status" aria-live="polite" aria-label="Cargando aplicación">
+    <div class="sf-contenido">
+      <div class="sf-marca">Simple<span>Factura</span></div>
+      <div class="sf-spinner" aria-hidden="true"></div>
+      <p class="sf-texto">Cargando aplicación…</p>
+    </div>
+  </div>
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <script>
+    (function () {
+      function ocultarLoader() {
+        var el = document.getElementById('sf-loading');
+        if (!el || el.classList.contains('sf-oculto')) return;
+        el.classList.add('sf-oculto');
+        setTimeout(function () {
+          if (el && el.parentNode) el.parentNode.removeChild(el);
+        }, 320);
+      }
+
+      window.addEventListener('flutter-first-frame', ocultarLoader);
+      // Por si el evento ya se disparó antes de registrar el listener.
+      document.addEventListener('DOMContentLoaded', function () {
+        if (window._flutter_web_initialized) ocultarLoader();
+      });
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

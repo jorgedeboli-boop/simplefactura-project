@@ -37,6 +37,17 @@ function limpiar_texto($valor) {
 }
 
 /**
+ * Texto opcional: cadena vacia / null -> null; resto limpio.
+ */
+function contacto_texto_opcional($valor) {
+    if ($valor === null) {
+        return null;
+    }
+    $texto = limpiar_texto(is_string($valor) ? $valor : (string) $valor);
+    return $texto === '' ? null : $texto;
+}
+
+/**
  * Convierte a decimal seguro (evita null/strings raros en calculos).
  */
 function a_decimal($valor, $default = 0.0) {

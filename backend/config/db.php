@@ -99,26 +99,52 @@ function db_consultar($conexion, $sql, $tipos = '', $parametros = array()) {
  * @return array ['id_insertado' => int, 'filas_afectadas' => int]
  */
 function db_ejecutar($conexion, $sql, $tipos = '', $parametros = array()) {
-    $stmt = mysqli_prepare($conexion, $sql);
-    if (!$stmt) {
-        responder_error('Error preparando consulta: ' . mysqli_error($conexion), 500);
-    }
+    try {
+        $stmt = mysqli_prepare($conexion, $sql);
+        if (!$stmt) {
+            responder_error('Error preparando consulta: ' . mysqli_error($conexion), 500);
+        }
 
-    if ($tipos !== '' && count($parametros) > 0) {
-        mysqli_stmt_bind_param($stmt, $tipos, ...$parametros);
-    }
+        if ($tipos !== '' && count($parametros) > 0) {
+            if (strlen($tipos) !== count($parametros)) {
+                mysqli_stmt_close($stmt);
+                responder_error(
+                    'Error interno: tipos/parametros no coinciden ('
+                    . strlen($tipos) . '/' . count($parametros) . ')',
+                    500
+                );
+            }
 
-    $ok = mysqli_stmt_execute($stmt);
-    if (!$ok) {
-        $error = mysqli_stmt_error($stmt);
+            // bind_param exige referencias; se crean a partir del array.
+            $refs = array();
+            foreach ($parametros as $clave => $valor) {
+                $refs[$clave] = &$parametros[$clave];
+            }
+            $okBind = call_user_func_array(
+                'mysqli_stmt_bind_param',
+                array_merge(array($stmt, $tipos), $refs)
+            );
+            if ($okBind === false) {
+                $error = mysqli_stmt_error($stmt);
+                mysqli_stmt_close($stmt);
+                responder_error('Error enlazando parametros: ' . $error, 500);
+            }
+        }
+
+        $ok = mysqli_stmt_execute($stmt);
+        if (!$ok) {
+            $error = mysqli_stmt_error($stmt);
+            mysqli_stmt_close($stmt);
+            responder_error('Error ejecutando consulta: ' . $error, 500);
+        }
+
+        $resultado = array(
+            'id_insertado'    => mysqli_stmt_insert_id($stmt),
+            'filas_afectadas' => mysqli_stmt_affected_rows($stmt),
+        );
         mysqli_stmt_close($stmt);
-        responder_error('Error ejecutando consulta: ' . $error, 500);
+        return $resultado;
+    } catch (Throwable $e) {
+        responder_error('Error de base de datos: ' . $e->getMessage(), 500);
     }
-
-    $resultado = array(
-        'id_insertado'    => mysqli_stmt_insert_id($stmt),
-        'filas_afectadas' => mysqli_stmt_affected_rows($stmt),
-    );
-    mysqli_stmt_close($stmt);
-    return $resultado;
 }

@@ -30,7 +30,8 @@ register_shutdown_function(function () {
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
     $mensaje = 'Error interno del servidor';
-    if (defined('SF_DEBUG') && SF_DEBUG) {
+    // En fatales siempre devolver un detalle corto para poder diagnosticar en produccion.
+    if (!empty($error['message'])) {
         $mensaje .= ': ' . $error['message'];
     }
     echo json_encode(array(
