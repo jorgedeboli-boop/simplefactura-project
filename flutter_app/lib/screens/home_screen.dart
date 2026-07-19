@@ -91,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onCerrarBusqueda: _cerrarBusqueda,
       onBusquedaChanged: _onBusquedaChanged,
       leading: _botonMenu(menuFijo: menuFijo),
+      topInset: MediaQuery.viewPaddingOf(context).top,
     );
   }
 

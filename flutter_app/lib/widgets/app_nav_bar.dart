@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
 
-/// Barra superior: 56px, azul #2196f3, titulo de pagina y busqueda expandible en listas.
+/// Barra superior: 56px + safe area (notch iPhone), azul #2196f3.
 class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
   const AppNavBar({
     super.key,
@@ -15,6 +16,7 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
     this.mostrarBusqueda = false,
     this.hintBusqueda = 'Buscar',
     this.leading,
+    this.topInset = 0,
   });
 
   final String titulo;
@@ -27,55 +29,62 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
   final ValueChanged<String> onBusquedaChanged;
   final Widget? leading;
 
-  static const _altura = 56.0;
+  /// Padding del notch / status bar (`MediaQuery.viewPadding.top`).
+  final double topInset;
+
+  static const alturaToolbar = 56.0;
 
   @override
-  Size get preferredSize => const Size.fromHeight(_altura);
+  Size get preferredSize => Size.fromHeight(alturaToolbar + topInset);
 
   @override
   Widget build(BuildContext context) {
-    if (busquedaActiva) {
-      return Material(
-        color: Colors.white,
+    final colorBarra = busquedaActiva ? Colors.white : AppTheme.colorNavBar;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: busquedaActiva
+          ? const SystemUiOverlayStyle(
+              statusBarColor: Colors.white,
+              statusBarIconBrightness: Brightness.dark,
+              statusBarBrightness: Brightness.light,
+            )
+          : const SystemUiOverlayStyle(
+              statusBarColor: AppTheme.colorNavBar,
+              statusBarIconBrightness: Brightness.light,
+              statusBarBrightness: Brightness.dark,
+            ),
+      child: Material(
+        color: colorBarra,
         elevation: 2,
         shadowColor: Colors.black26,
-        child: SizedBox(
-          height: _altura,
-          width: double.infinity,
-          child: Row(
-            children: [
-              if (leading != null) leading!,
-              IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.grey.shade700),
-                onPressed: onAlternarBusqueda,
-              ),
-              Expanded(
-                child: _CampoBusquedaNavBar(
-                  controller: busquedaController,
-                  hint: hintBusqueda,
-                  onChanged: onBusquedaChanged,
-                  onPerdioFocoVacio: onCerrarBusqueda,
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.close, color: Colors.grey.shade700, size: 22),
-                onPressed: onCerrarBusqueda,
-                tooltip: 'Cerrar búsqueda',
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Extiende el color bajo el notch / status bar.
+            SizedBox(height: topInset, width: double.infinity),
+            SizedBox(
+              height: alturaToolbar,
+              width: double.infinity,
+              child: busquedaActiva ? _barraBusqueda(context) : _barraTitulo(context),
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
+  }
 
+  Widget _barraTitulo(BuildContext context) {
     return AppBar(
-      toolbarHeight: _altura,
+      primary: false,
+      toolbarHeight: alturaToolbar,
       backgroundColor: AppTheme.colorNavBar,
       foregroundColor: Colors.white,
-      elevation: 2,
-      shadowColor: Colors.black26,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
       automaticallyImplyLeading: leading == null,
       leading: leading,
+      titleSpacing: leading == null ? null : 0,
       title: Text(
         titulo,
         style: const TextStyle(
@@ -92,6 +101,31 @@ class AppNavBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ]
           : null,
+    );
+  }
+
+  Widget _barraBusqueda(BuildContext context) {
+    return Row(
+      children: [
+        if (leading != null) leading!,
+        IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.grey.shade700),
+          onPressed: onAlternarBusqueda,
+        ),
+        Expanded(
+          child: _CampoBusquedaNavBar(
+            controller: busquedaController,
+            hint: hintBusqueda,
+            onChanged: onBusquedaChanged,
+            onPerdioFocoVacio: onCerrarBusqueda,
+          ),
+        ),
+        IconButton(
+          icon: Icon(Icons.close, color: Colors.grey.shade700, size: 22),
+          onPressed: onCerrarBusqueda,
+          tooltip: 'Cerrar búsqueda',
+        ),
+      ],
     );
   }
 }

@@ -115,10 +115,16 @@ class _AppMenuPanelState extends State<AppMenuPanel> {
 
     return ColoredBox(
       color: AppTheme.colorPanel,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: MediaQuery.viewPaddingOf(context).top),
+          Expanded(
+            child: SafeArea(
+              top: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
               child: Align(
@@ -177,8 +183,11 @@ class _AppMenuPanelState extends State<AppMenuPanel> {
               title: Text('Cerrar sesión', style: AppTheme.textoDrawerSecundario),
               onTap: () => _solicitarCerrarSesion(context, auth),
             ),
-          ],
-        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
