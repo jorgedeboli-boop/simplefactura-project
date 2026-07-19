@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import '../utils/status_bar.dart';
 
 /// Fondo azul de transición (login / logout) con el patrón SVG de marca.
 abstract final class TransicionAuth {
   static const colorBase = Color(0xFF2196F3);
 
   static const _svgFondo = '''
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1600 900">
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
   <defs>
     <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100%" y2="0">
       <stop offset="0" stop-color="#114f7f" stop-opacity="0"/>
@@ -17,6 +20,7 @@ abstract final class TransicionAuth {
       <stop offset="1" stop-color="#239dff"/>
     </linearGradient>
   </defs>
+  <rect fill="#2196f3" width="1600" height="900"/>
   <rect fill="url(#a)" width="1600" height="900"/>
   <rect fill="url(#b)" width="1600" height="900"/>
 </svg>
@@ -28,12 +32,23 @@ abstract final class TransicionAuth {
     required String mensaje,
     Duration retardo = const Duration(seconds: 3),
   }) {
+    aplicarColorBarraTransicion();
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: colorBase,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: colorBase,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
+
     return showGeneralDialog<void>(
       context: context,
       useRootNavigator: true,
       barrierDismissible: false,
       barrierLabel: mensaje,
-      barrierColor: Colors.transparent,
+      barrierColor: colorBase,
       transitionDuration: const Duration(milliseconds: 350),
       pageBuilder: (context, animation, secondaryAnimation) {
         return _OverlayTransicionAuth(mensaje: mensaje, retardo: retardo);
@@ -49,7 +64,16 @@ abstract final class TransicionAuth {
           child: child,
         );
       },
-    );
+    ).whenComplete(() {
+      restaurarColorBarraEstado();
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
+      );
+    });
   }
 
   static Widget fondo({required Widget child}) {
@@ -95,33 +119,45 @@ class _OverlayTransicionAuthState extends State<_OverlayTransicionAuth> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: TransicionAuth.fondo(
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(
-                width: 36,
-                height: 36,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  color: Colors.white,
-                ),
+    // Cubre notch / home indicator: pantallacompleta sin respetar safe area.
+    final size = MediaQuery.sizeOf(context);
+    final padding = MediaQuery.paddingOf(context);
+
+    return SizedBox(
+      width: size.width,
+      height: size.height,
+      child: Material(
+        color: TransicionAuth.colorBase,
+        child: TransicionAuth.fondo(
+          child: Padding(
+            // El contenido del loader sí respeta safe area; el azul no.
+            padding: EdgeInsets.only(top: padding.top, bottom: padding.bottom),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    widget.mensaje,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              Text(
-                widget.mensaje,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
