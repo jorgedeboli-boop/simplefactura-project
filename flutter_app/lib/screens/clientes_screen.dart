@@ -147,7 +147,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
     try {
       final archivo = pdf
           ? await _exportService.exportarPdf(clientes)
-          : _exportService.exportarExcel(clientes);
+          : await _exportService.exportarExcel(clientes);
 
       descargarArchivo(
         nombre: archivo.nombre,

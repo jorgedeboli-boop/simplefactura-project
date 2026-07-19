@@ -153,7 +153,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     try {
       final archivo = pdf
           ? await _exportService.exportarPdf(usuarios)
-          : _exportService.exportarExcel(usuarios);
+          : await _exportService.exportarExcel(usuarios);
 
       descargarArchivo(
         nombre: archivo.nombre,

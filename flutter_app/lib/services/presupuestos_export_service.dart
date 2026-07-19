@@ -1,7 +1,7 @@
-import 'package:excel/excel.dart';
+import 'package:excel/excel.dart' deferred as excel show Excel, TextCellValue, CellIndex;
 import 'package:intl/intl.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart' deferred as pdf;
+import 'package:pdf/widgets.dart' deferred as pw;
 
 import '../models/presupuesto_listado.dart';
 
@@ -55,13 +55,14 @@ class PresupuestosExportService {
   }
 
   Future<({String nombre, List<int> bytes})> exportarPdf(List<PresupuestoListado> presupuestos) async {
+    await Future.wait([pdf.loadLibrary(), pw.loadLibrary()]);
     final filas = _filas(presupuestos);
-    final pdf = pw.Document();
+    final doc = pw.Document();
 
-    pdf.addPage(
+    doc.addPage(
       pw.MultiPage(
-        pageFormat: PdfPageFormat.a4.landscape,
-        margin: const pw.EdgeInsets.all(24),
+        pageFormat: pdf.PdfPageFormat.a4.landscape,
+        margin: pw.EdgeInsets.all(24),
         build: (context) => [
           pw.Text(
             'Listado de presupuestos',
@@ -70,47 +71,48 @@ class PresupuestosExportService {
           pw.SizedBox(height: 8),
           pw.Text(
             'Generado: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())} · ${presupuestos.length} registros',
-            style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
+            style: pw.TextStyle(fontSize: 9, color: pdf.PdfColors.grey700),
           ),
           pw.SizedBox(height: 16),
           pw.TableHelper.fromTextArray(
             headers: columnas,
             data: filas,
             headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
-            cellStyle: const pw.TextStyle(fontSize: 8),
+            cellStyle: pw.TextStyle(fontSize: 8),
             cellAlignment: pw.Alignment.centerLeft,
-            headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
+            headerDecoration: pw.BoxDecoration(color: pdf.PdfColors.grey300),
             cellHeight: 22,
           ),
         ],
       ),
     );
 
-    return (nombre: _nombreArchivo('pdf'), bytes: await pdf.save());
+    return (nombre: _nombreArchivo('pdf'), bytes: await doc.save());
   }
 
-  ({String nombre, List<int> bytes}) exportarExcel(List<PresupuestoListado> presupuestos) {
-    final excel = Excel.createExcel();
-    final nombreHoja = excel.sheets.keys.first;
-    excel.rename(nombreHoja, 'Presupuestos');
-    final sheet = excel.sheets['Presupuestos']!;
+  Future<({String nombre, List<int> bytes})> exportarExcel(List<PresupuestoListado> presupuestos) async {
+    await excel.loadLibrary();
+    final libro = excel.Excel.createExcel();
+    final nombreHoja = libro.sheets.keys.first;
+    libro.rename(nombreHoja, 'Presupuestos');
+    final sheet = libro.sheets['Presupuestos']!;
 
     for (var col = 0; col < columnas.length; col++) {
       sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: 0))
-          .value = TextCellValue(columnas[col]);
+          .cell(excel.CellIndex.indexByColumnRow(columnIndex: col, rowIndex: 0))
+          .value = excel.TextCellValue(columnas[col]);
     }
 
     final filas = _filas(presupuestos);
     for (var row = 0; row < filas.length; row++) {
       for (var col = 0; col < filas[row].length; col++) {
         sheet
-            .cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: row + 1))
-            .value = TextCellValue(filas[row][col]);
+            .cell(excel.CellIndex.indexByColumnRow(columnIndex: col, rowIndex: row + 1))
+            .value = excel.TextCellValue(filas[row][col]);
       }
     }
 
-    final bytes = excel.encode();
+    final bytes = libro.encode();
     if (bytes == null) {
       throw StateError('No se pudo generar el archivo Excel');
     }

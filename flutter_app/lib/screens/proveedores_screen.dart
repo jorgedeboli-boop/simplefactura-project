@@ -135,7 +135,7 @@ class _ProveedoresScreenState extends State<ProveedoresScreen> {
     try {
       final archivo = pdf
           ? await _exportService.exportarPdf(proveedores)
-          : _exportService.exportarExcel(proveedores);
+          : await _exportService.exportarExcel(proveedores);
       descargarArchivo(
         nombre: archivo.nombre,
         bytes: archivo.bytes,

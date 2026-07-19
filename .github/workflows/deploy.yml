@@ -66,6 +66,7 @@ jobs:
             **/_notes/**
             **/.DS_Store
             **/.ftp-deploy-state*.json
+            **/canvaskit/**
 
       - name: Subir archivos críticos Flutter
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -103,3 +104,4 @@ jobs:
             **/api/config/constantes.php
             **/_notes/**
             **/.DS_Store
+            **/canvaskit/**

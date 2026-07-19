@@ -131,7 +131,7 @@ class _FacturasScreenState extends State<FacturasScreen> {
       return;
     }
     try {
-      final archivo = pdf ? await _exportService.exportarPdf(items) : _exportService.exportarExcel(items);
+      final archivo = pdf ? await _exportService.exportarPdf(items) : await _exportService.exportarExcel(items);
       descargarArchivo(
         nombre: archivo.nombre,
         bytes: archivo.bytes,
